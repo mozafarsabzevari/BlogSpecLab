@@ -1,50 +1,176 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+گزارش اثر همگام‌سازی (Sync Impact Report)
+- تغییر نسخه: قالب خام (بدون نسخه) → 1.0.0
+- اصول (جایگزینی پنج اصل نمونهٔ قالب با شش اصل پروژه):
+  - [PRINCIPLE_1_NAME] → I. توسعهٔ مبتنی بر مشخصات
+  - [PRINCIPLE_2_NAME] → II. معماری و قواعد وابستگی
+  - [PRINCIPLE_3_NAME] → III. امنیت و مرز مسئولیت‌ها
+  - [PRINCIPLE_4_NAME] → IV. کیفیت و آزمون‌پذیری
+  - [PRINCIPLE_5_NAME] → V. سادگی و توسعهٔ تدریجی
+  - (اصل افزوده) → VI. حاکمیت و مدیریت تغییر Constitution
+- بخش‌های افزوده: «محدودیت‌های فناوری و دامنه»، «گردش کار توسعه و بازبینی»
+- بخش‌های حذف‌شده: هیچ
+- فایل‌های وابسته: قالب‌های `.specify/templates/` و دستورهای `.cursor/skills/speckit-*`
+  تغییر نکردند؛ این فایل‌ها Constitution را هنگام اجرا می‌خوانند.
+- موارد معوق: هیچ TODO باقی نمانده است.
+-->
 
-## Core Principles
+# Constitution پروژهٔ BlogSpecLab
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## اصول بنیادین (Core Principles)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### I. توسعهٔ مبتنی بر مشخصات
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+1. تمام قابلیت‌ها باید براساس Specification بررسی‌شده و تأییدشده توسعه یابند.
+2. پیش از پیاده‌سازی، رفتار مورد انتظار، محدودیت‌ها، معیارهای پذیرش و سناریوهای خطای مهم باید
+   مشخص شوند.
+3. چرخهٔ SDD شامل Specify، Clarify، Plan، Tasks، Implement، Test و Review باید متناسب با نوع
+   تغییر رعایت شود. این Constitution اصول حاکم بر تمام این مراحل را تعیین می‌کند.
+4. تغییرات مهم رفتاری باید ابتدا در Specification منعکس شوند و سپس اثر آن‌ها بر طراحی، وظایف،
+   کد و آزمون‌ها بررسی شود.
+5. خروجی‌های Coding Agent باید پیش از پذیرش از نظر انطباق با Specification و اصول این
+   Constitution بررسی شوند.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. معماری و قواعد وابستگی
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+پروژه باید به‌صورت یک سامانهٔ یکپارچه و غیرماژولار با تفکیک روشن مسئولیت‌ها توسعه یابد.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+ساختار هدف Solution:
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+```text
+BlogSpecLab/
+├── BlogSpecLab.slnx
+├── src/
+│   ├── 01.Core/
+│   │   ├── Domain/
+│   │   │   └── BlogSpecLab.Core.Domain.csproj
+│   │   └── Application/
+│   │       └── BlogSpecLab.Core.Application.csproj
+│   ├── 02.Infra/
+│   │   ├── DataAccess/
+│   │   │   └── BlogSpecLab.Infra.DataAccess.csproj
+│   │   ├── AI/
+│   │   │   └── BlogSpecLab.Infra.AI.csproj
+│   │   └── Qdrant/
+│   │       └── BlogSpecLab.Infra.Qdrant.csproj
+│   └── 03.Endpoints/
+│       └── Api/
+│           └── BlogSpecLab.Endpoints.Api.csproj
+├── tests/
+│   └── BlogSpecLab.Tests/
+└── .specify/
+```
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+این ساختار، معماری هدف است. پروژه‌های مرتبط با AI و Qdrant فقط هنگام ایجاد نیاز واقعی ساخته
+می‌شوند.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+مسئولیت پروژه‌ها:
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- `Core.Domain`: موجودیت‌ها، اشیای مقداری، قواعد و ناورداهای دامنه؛ مستقل از زیرساخت.
+- `Core.Application`: موارد کاربرد، هماهنگی عملیات، کنترل مجوزهای مرتبط با موارد کاربرد و تعریف
+  قراردادهای سرویس‌های بیرونی.
+- `Infra.DataAccess`: پیاده‌سازی Persistence و Repositoryها و جزئیات دسترسی به داده‌های
+  عملیاتی.
+- `Infra.AI`: پیاده‌سازی ارتباط با مدل‌های زبانی و SDK سرویس‌دهندگان.
+- `Infra.Qdrant`: پیاده‌سازی ارتباط با Qdrant و عملیات ذخیره‌سازی و جست‌وجوی برداری.
+- `Endpoints.Api`: نقطهٔ ورود HTTP، قراردادهای API، پیکربندی Dependency Injection و
+  Composition.
+- `Tests`: آزمون‌های خودکار متناسب با قابلیت‌های ایجادشده.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+قواعد الزام‌آور Project Reference:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. `Core.Domain` نباید به هیچ پروژهٔ دیگری از Solution وابسته باشد.
+2. `Core.Application` می‌تواند به `Core.Domain` وابسته باشد، اما نباید به Infrastructure یا
+   Endpoints رفرنس بدهد.
+3. پروژه‌های Infrastructure می‌توانند به `Core.Application` و در صورت نیاز `Core.Domain` رفرنس
+   داشته باشند.
+4. `Endpoints.Api` می‌تواند به `Core.Application` و پروژه‌های Infrastructure موردنیاز برای
+   Composition رفرنس داشته باشد.
+5. وابستگی چرخه‌ای و وابستگی مستقیم میان پروژه‌های Infrastructure، بدون تصمیم معماری مستند،
+   ممنوع است.
+6. منطق کسب‌وکار نباید در Endpoints یا Infrastructure تکرار شود.
+7. استفاده از ساختار Modules، معماری Microservices، ZaminX یا Building Blockهای اختصاصی سایر
+   پروژه‌ها در این پروژه مجاز نیست.
+8. پروژه‌ها و انتزاع‌های جدید فقط زمانی ایجاد شوند که نیازمندی تأییدشده‌ای وجود آن‌ها را توجیه کند.
+
+### III. امنیت و مرز مسئولیت‌ها
+
+1. قواعد کسب‌وکار و ناورداهای مربوط به وضعیت موجودیت‌ها باید در Domain یا Application اعمال
+   شوند.
+2. کنترل مجوزها و پیش‌شرط‌های عملیات حساس باید در مسیر قابل اعتماد نرم‌افزار اجرا شود.
+3. خروجی مدل زبانی، آرگومان‌های Tool و اطلاعات بازیابی‌شده از منابع بیرونی دادهٔ غیرقابل اعتماد
+   محسوب می‌شوند و باید متناسب با کاربرد اعتبارسنجی شوند.
+4. هیچ مدل زبانی یا Agent نباید صرفاً براساس خروجی خودش مجوز تغییر وضعیت سیستم را ایجاد کند.
+5. عملیات حساس و تغییردهنده باید تأییدهای لازم را در Application بررسی کنند.
+6. اطلاعات محرمانه و API Keyها نباید در کد منبع یا Logها ثبت شوند.
+
+### IV. کیفیت و آزمون‌پذیری
+
+1. قواعد مهم Domain و موارد کاربرد Application باید با آزمون‌های خودکار بررسی شوند.
+2. آزمون‌ها باید متناسب با رفتار قابلیت، سناریوهای موفق، ناموفق، شرایط مرزی و دسترسی غیرمجاز را
+   پوشش دهند.
+3. منطق Domain و Application باید تا حد امکان مستقل از اجرای سرویس‌های بیرونی قابل آزمون باشد.
+4. Integrationهای خارجی باید در سطح مناسب آزمون شوند.
+5. صحت نحوی یا ساختاری خروجی مدل زبانی به‌تنهایی به‌معنای صحت معنایی یا کسب‌وکاری آن نیست.
+6. هر قابلیت باید معیار پذیرش و شواهد قابل بررسی برای تأیید تکمیل داشته باشد.
+
+### V. سادگی و توسعهٔ تدریجی
+
+1. خوانایی، سادگی و قابلیت توضیح بر پیچیدگی غیرضروری اولویت دارند.
+2. از ایجاد زودهنگام پروژه‌ها، Interfaceها، Frameworkها و Abstractionهای بدون نیاز واقعی باید
+   خودداری شود.
+3. نسخهٔ اولیهٔ نرم‌افزار باید بدون وابستگی به مدل زبانی، MCP، Agent یا Vector Database قابل
+   اجرا باشد.
+4. قابلیت‌های هوش مصنوعی باید در پاسخ به نیازمندی‌های تأییدشده و به‌صورت مرحله‌ای اضافه شوند.
+5. Tool Calling و MCP باید از قابلیت‌های موجود Application استفاده کنند و منطق کسب‌وکار مستقلی
+   ایجاد نکنند.
+6. در بخش RAG، مسیر ورود و آماده‌سازی دانش باید از مسیر Retrieval و Generation جدا باشد.
+7. Agent باید از ابزارهای کنترل‌شده، محدودیت تعداد مراحل، شرایط توقف و تأیید انسانی موردنیاز
+   استفاده کند.
+8. انتخاب مدل‌ها، SDKها و Frameworkهای AI باید هنگام ایجاد نیاز واقعی و با بررسی محدودیت‌ها و
+   پیامدهای معماری انجام شود.
+
+### VI. حاکمیت و مدیریت تغییر Constitution
+
+1. این Constitution مرجع اصول پایدار و الزام‌آور توسعهٔ پروژه است.
+2. هر تغییر در اصول Constitution باید با دلیل مشخص و بررسی اثر آن بر Specificationها، طراحی،
+   کد و آزمون‌ها انجام شود.
+3. تعارض میان یک Specification یا Plan و Constitution باید پیش از پیاده‌سازی برطرف شود.
+4. تغییر Constitution باید با ثبت نسخه، تاریخ تغییر و خلاصهٔ تغییرات همراه باشد.
+5. اگر رعایت یکی از اصول در شرایطی خاص امکان‌پذیر نباشد، استثنا باید با دلیل، پیامدها و تأیید
+   صریح مستند شود.
+6. مستندات باید منعکس‌کنندهٔ تصمیم‌های تأییدشده و وضعیت واقعی پروژه باشند؛ قابلیت‌های
+   برنامه‌ریزی‌شده نباید به‌عنوان قابلیت‌های پیاده‌سازی‌شده معرفی شوند.
+
+## محدودیت‌های فناوری و دامنه
+
+- زبان اصلی C#، چارچوب ASP.NET Core و نسخهٔ هدف .NET 10 است.
+- روش توسعه SDD و ابزار آن Spec Kit است.
+- دامنهٔ نسخهٔ اولیه: مدیریت پست‌های وبلاگ و انتشار کنترل‌شدهٔ محتوای تأییدشده.
+- قابلیت‌های Structured Output، Tool Calling، MCP، RAG با Qdrant و Agent برنامه‌ریزی‌شده‌اند و
+  به‌صورت تدریجی به همین پروژه افزوده می‌شوند.
+- پایگاه دادهٔ عملیاتی، ارائه‌دهندهٔ مدل زبانی و Embedding Model هنوز انتخاب نشده‌اند و این
+  Constitution آن‌ها را تعیین نمی‌کند.
+
+## گردش کار توسعه و بازبینی
+
+- مراحل Specify، Clarify، Plan، Tasks و Implement با دستورهای متناظر Spec Kit انجام می‌شوند:
+  `/speckit-specify`، `/speckit-clarify`، `/speckit-plan`، `/speckit-tasks` و
+  `/speckit-implement`.
+- مراحل Test و Review دستور اختصاصی Spec Kit ندارند و باید با اجرای آزمون‌های خودکار و بازبینی
+  انطباق با Specification و این Constitution انجام شوند.
+- بخش Constitution Check در هر Plan باید پیش از تولید Tasks تکمیل شود.
+
+## حاکمیت (Governance)
+
+- این Constitution بر سایر رویه‌ها و مستندات توسعهٔ پروژه مقدم است.
+- روش اصلاح: هر اصلاح باید طبق اصل VI انجام شود و نسخه، تاریخ و خلاصهٔ تغییر آن در گزارش اثر
+  ابتدای همین فایل ثبت شود.
+- سیاست نسخه‌گذاری (Semantic Versioning):
+  - MAJOR: حذف یا بازتعریف ناسازگار یک اصل یا قاعدهٔ حاکمیتی.
+  - MINOR: افزودن اصل یا بخش جدید، یا گسترش محسوس راهنمایی‌های موجود.
+  - PATCH: شفاف‌سازی، اصلاح عبارت یا خطای نگارشی بدون تغییر معنا.
+- بازبینی انطباق: هر Specification، Plan و خروجی Coding Agent باید پیش از پذیرش با این
+  Constitution مقایسه شود و هر عدم انطباق یا استثنای تأییدشده مستند شود.
+
+**Version**: 1.0.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
