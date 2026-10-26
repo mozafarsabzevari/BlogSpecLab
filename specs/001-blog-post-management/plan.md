@@ -1,82 +1,88 @@
-# Implementation Plan: مدیریت و انتشار کنترل‌شدهٔ پست‌های وبلاگ
+<div dir="rtl">
 
-**Branch**: `main` | **Date**: 2026-10-19 | **Spec**: [spec.md](./spec.md)
+# طرح پیاده‌سازی: مدیریت و انتشار کنترل‌شدهٔ پست‌های وبلاگ
 
-**Input**: Feature specification from `/specs/001-blog-post-management/spec.md`
+| مشخصه | مقدار |
+|-------|-------|
+| شاخه | `main` |
+| تاریخ | 2026-10-19 |
+| مشخصات | [spec.md](./spec.md) |
+| ورودی | مشخصات قابلیت در `specs/001-blog-post-management/spec.md` |
 
-**Note**: This template is filled in by the `/speckit-plan` command; its definition describes the execution workflow.
+> این سند با دستور `/speckit-plan` و براساس قالب Plan در Spec Kit تهیه شده است.
 
-## Summary
+## خلاصه
 
-نویسنده‌ها پست‌های خود را ایجاد، ویرایش، ارسال و حذف می‌کنند؛ ویراستارها پست‌ها را تأیید یا با دلیل
-بازمی‌گردانند و فقط پست‌های تأییدشده را منتشر می‌کنند؛ خوانندگان فقط پست‌های منتشرشده را می‌بینند.
-هیچ پستی بدون تأیید ویراستاری غیر از نویسنده منتشر نمی‌شود.
+نویسنده‌ها پست‌های خود را ایجاد، ویرایش، ارسال و حذف می‌کنند. ویراستارها پست‌ها را تأیید یا با
+ذکر دلیل بازمی‌گردانند و فقط پست‌های تأییدشده را منتشر می‌کنند. خوانندگان فقط پست‌های منتشرشده را
+می‌بینند. هیچ پستی بدون تأیید ویراستاری غیر از نویسندهٔ آن منتشر نمی‌شود.
 
-رویکرد فنی: یک Web API با ASP.NET Core Minimal APIs روی .NET 10. قواعد وضعیت در موجودیت `Post` در
-`Core.Domain` متمرکزند، موارد کاربرد و کنترل مجوز در `Core.Application` و ذخیره‌سازی با EF Core و
-SQLite در `Infra.DataAccess` انجام می‌شود. هم‌زمانی با Concurrency Token کنترل می‌شود. جزئیات
-تصمیم‌ها در [research.md](./research.md) آمده است.
+رویکرد فنی:
 
-## Technical Context
+- یک سرویس وب (HTTP API) با ASP.NET Core و سبک Minimal APIs روی .NET 10.
+- قواعد وضعیت پست در موجودیت `Post` در پروژهٔ `Core.Domain` متمرکز است.
+- موارد کاربرد و کنترل مجوز در پروژهٔ `Core.Application` قرار دارد.
+- ذخیره‌سازی با EF Core و SQLite در پروژهٔ `Infra.DataAccess` انجام می‌شود.
+- هم‌زمانی با شمارندهٔ نسخه (Concurrency Token) کنترل می‌شود.
 
-**Language/Version**: C# روی .NET 10 (ASP.NET Core) — طبق Constitution
+جزئیات و دلیل هر تصمیم در [research.md](./research.md) آمده است.
 
-**Primary Dependencies**: ASP.NET Core Minimal APIs (R-01)؛ Entity Framework Core با Provider
-SQLite (R-03)؛ `Microsoft.EntityFrameworkCore.Design` برای Migrations (R-04)
+## زمینهٔ فنی
 
-**Storage**: SQLite (R-02)؛ جدول‌های `Posts` و `PostStatusChanges` ([data-model.md](./data-model.md))
+| موضوع | تصمیم |
+|-------|-------|
+| زبان و نسخه | C# روی .NET 10 و ASP.NET Core (طبق Constitution) |
+| وابستگی‌های اصلی | Minimal APIs (R-01)، EF Core با درایور SQLite (R-03)، ابزار Migrations (R-04) |
+| ذخیره‌سازی | SQLite (R-02)، با دو جدول پست‌ها و سابقهٔ وضعیت ([data-model.md](./data-model.md)) |
+| آزمون | xUnit و WebApplicationFactory با SQLite درون‌حافظه‌ای (R-05) |
+| بستر اجرا | سرور چندسکویی؛ Windows برای توسعه، Windows یا Linux برای اجرا |
+| نوع پروژه | سرویس وب (HTTP API)؛ رابط کاربری خارج از این قابلیت است |
+| هدف کارایی | Specification هدف عددی ندارد؛ SC-004 و SC-005 به زمان کار کاربر مربوط‌اند |
+| محدودیت‌ها | اجرا بدون مدل زبانی، MCP، Agent یا پایگاه دادهٔ برداری (اصل V.3)؛ بدون بستهٔ اضافه؛ هویت کاربر فقط از طریق `ICurrentUser` (R-06) |
+| مقیاس | آموزشی: ده‌ها کاربر و حداکثر چند هزار پست؛ ۱۵ مسیر API در سه گروه؛ بدون صفحه‌بندی (R-16) |
 
-**Testing**: xUnit؛ `Microsoft.AspNetCore.Mvc.Testing` (WebApplicationFactory) با SQLite In-Memory (R-05)
+## بررسی انطباق با Constitution
 
-**Target Platform**: سرور Cross-platform (Windows برای توسعه، Linux یا Windows برای اجرا)
+این بررسی پیش از پژوهش و دوباره پس از طراحی انجام شد. نتیجهٔ هر دو بار یکسان است.
 
-**Project Type**: Web service (HTTP API)؛ رابط کاربری خارج از این Feature است
+| اصل | شرح بررسی | نتیجه |
+|-----|-----------|-------|
+| I. توسعهٔ مبتنی بر مشخصات | Specification تأییدشده (2026-10-24) و شفاف‌سازی‌های آن مبنای طرح است؛ هر نیازمندی در مدل داده یا قرارداد API نگاشت دارد. | ✅ |
+| II. معماری و وابستگی‌ها | فقط پروژه‌های Domain، Application، DataAccess، Api و Tests ساخته می‌شوند؛ پروژه‌های AI و Qdrant ساخته نمی‌شوند؛ جهت وابستگی‌ها مطابق قواعد است. | ✅ |
+| II.6 عدم تکرار منطق | انتقال‌های وضعیت فقط در `Post` انجام می‌شوند (R-10)؛ مسیرهای API فقط درخواست را به Application می‌سپارند. | ✅ |
+| II.8 انتزاع فقط با نیاز | `IPostRepository` به‌خاطر قاعدهٔ ۲ وابستگی پروژه‌ها و `ICurrentUser` برای جدا ماندن Application از روش ورود لازم‌اند؛ کتابخانهٔ Mediator یا State Machine استفاده نمی‌شود (R-09، R-10). | ✅ |
+| III. امنیت | قواعد وضعیت در Domain و مجوزها در Application؛ پاسخ 404 برای پست‌های غیرقابل دسترس (R-13)؛ ورود آزمایشی فقط در محیط توسعه و آزمون (R-06)؛ بدون اطلاعات محرمانه در کد. | ✅ |
+| IV. کیفیت و آزمون‌پذیری | آزمون واحد برای Domain و Application و آزمون پذیرش HTTP برای همهٔ سناریوهای quickstart، از جمله دسترسی غیرمجاز و هم‌زمانی؛ زمان در آزمون‌ها قابل کنترل است (R-08). | ✅ |
+| V. سادگی | Minimal APIs، سرویس‌های ساده، SQLite، بدون صفحه‌بندی و بدون قابلیت هوش مصنوعی. | ✅ |
+| VI. حاکمیت | تصمیم‌های سراسری با برچسب «کاندید Technical Baseline پروژه» برای بازبینی انسانی مشخص شده‌اند؛ Constitution تغییر نمی‌کند. | ✅ |
 
-**Performance Goals**: هدف عددی خاصی در Specification نیست؛ SC-004 و SC-005 به زمان کار کاربر
-مربوط‌اند و با پاسخ‌گویی عادی API تأمین می‌شوند
+نتیجه: هیچ نقضی وجود ندارد.
 
-**Constraints**: اجرا بدون مدل زبانی، MCP، Agent یا Vector Database (اصل V.3)؛ بدون Package
-اضافه جز موارد بالا؛ هویت فقط از طریق `ICurrentUser` (R-06)
+## ساختار پروژه
 
-**Scale/Scope**: مقیاس آموزشی (ده‌ها کاربر، حداکثر چند هزار پست)؛ ۳ گروه مسیر و ۱۵ Endpoint
-([contracts/http-api.md](./contracts/http-api.md))؛ بدون صفحه‌بندی (R-16)
+### مستندات این قابلیت
 
-## Constitution Check
-
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-| اصل | بررسی | وضعیت پیش از طراحی | وضعیت پس از طراحی |
-|-----|-------|---------------------|---------------------|
-| I. توسعهٔ مبتنی بر مشخصات | Specification تأییدشده (2026-10-24) و Clarifications ثبت‌شده مبنای Plan است؛ هر FR در data-model یا contracts نگاشت دارد | ✅ | ✅ |
-| II. معماری و قواعد وابستگی | فقط پروژه‌های Domain، Application، Infra.DataAccess، Endpoints.Api و Tests؛ AI و Qdrant ساخته نمی‌شوند؛ Domain بدون وابستگی؛ Application فقط به Domain؛ بدون Modules یا ZaminX | ✅ | ✅ |
-| II.6 عدم تکرار منطق | انتقال‌های وضعیت فقط در `Post` (R-10)؛ Endpointها فقط نگاشت HTTP | ✅ | ✅ |
-| II.8 انتزاع فقط با نیاز | `IPostRepository` به دلیل قاعدهٔ ۲ Project Reference و `ICurrentUser` به دلیل جدا ماندن Application از سازوکار ورود لازم‌اند؛ Mediator و State Machine Library استفاده نمی‌شوند (R-09، R-10) | ✅ | ✅ |
-| III. امنیت و مرز مسئولیت‌ها | قواعد وضعیت در Domain؛ مجوزها در Application؛ 404 برای پست‌های غیرقابل دسترس (R-13)؛ Scheme توسعه فقط در Development/Testing (R-06)؛ بدون Secret در کد | ✅ | ✅ |
-| IV. کیفیت و آزمون‌پذیری | آزمون واحد Domain/Application و آزمون پذیرش HTTP برای همهٔ سناریوهای quickstart، شامل دسترسی غیرمجاز و هم‌زمانی؛ `TimeProvider` برای کنترل زمان (R-08) | ✅ | ✅ |
-| V. سادگی و توسعهٔ تدریجی | Minimal APIs، سرویس‌های ساده، SQLite، بدون صفحه‌بندی؛ بدون قابلیت AI | ✅ | ✅ |
-| VI. حاکمیت | انتخاب پایگاه داده و سایر تصمیم‌های سراسری به‌عنوان «کاندید Technical Baseline پروژه» برای بازبینی انسانی علامت خورده‌اند؛ Constitution تغییر نمی‌کند | ✅ | ✅ |
-
-نتیجه: هیچ نقضی وجود ندارد؛ Complexity Tracking لازم نیست.
-
-## Project Structure
-
-### Documentation (this feature)
+</div>
 
 ```text
 specs/001-blog-post-management/
 ├── spec.md
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
 ├── contracts/
-│   └── http-api.md      # Phase 1 output (/speckit-plan command)
+│   └── http-api.md
 ├── checklists/
 │   └── requirements.md
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+└── tasks.md        (later, by /speckit-tasks)
 ```
 
-### Source Code (repository root)
+<div dir="rtl">
+
+### کد منبع
+
+</div>
 
 ```text
 BlogSpecLab.slnx
@@ -84,32 +90,52 @@ src/
 ├── 01.Core/
 │   ├── Domain/
 │   │   ├── BlogSpecLab.Core.Domain.csproj
-│   │   └── Posts/                 # Post، PostStatus، StatusChange، خطاهای دامنه
+│   │   └── Posts/
 │   └── Application/
 │       ├── BlogSpecLab.Core.Application.csproj
-│       ├── Common/                # ICurrentUser، نتایج و خطاهای Application
-│       └── Posts/                 # AuthorPostService، EditorPostService، PublicPostQueries، IPostRepository، DTOها
+│       ├── Common/
+│       └── Posts/
 ├── 02.Infra/
 │   └── DataAccess/
 │       ├── BlogSpecLab.Infra.DataAccess.csproj
 │       ├── BlogSpecLabDbContext.cs
-│       ├── Posts/                 # پیکربندی EF و PostRepository
+│       ├── Posts/
 │       └── Migrations/
 └── 03.Endpoints/
     └── Api/
         ├── BlogSpecLab.Endpoints.Api.csproj
-        ├── Program.cs             # Composition و DI
-        ├── Authentication/        # Scheme توسعه و پیاده‌سازی ICurrentUser
-        └── Posts/                 # AuthorEndpoints، EditorEndpoints، PublicEndpoints، نگاشت خطا به ProblemDetails
+        ├── Program.cs
+        ├── Authentication/
+        └── Posts/
 tests/
 └── BlogSpecLab.Tests/
     ├── BlogSpecLab.Tests.csproj
-    ├── Domain/                    # قواعد Post و ماشین وضعیت
-    ├── Application/               # مجوزها و موارد کاربرد
-    └── Api/                       # آزمون‌های پذیرش HTTP (سناریوهای quickstart)
+    ├── Domain/
+    ├── Application/
+    └── Api/
 ```
 
-جهت Project Referenceها:
+<div dir="rtl">
+
+محتوای پوشه‌ها:
+
+| پوشه | محتوا |
+|------|-------|
+| `Domain/Posts` | موجودیت `Post`، وضعیت‌ها (`PostStatus`)، سابقهٔ وضعیت (`StatusChange`) و خطاهای دامنه |
+| `Application/Common` | قرارداد `ICurrentUser` و نتایج و خطاهای Application |
+| `Application/Posts` | سرویس‌های `AuthorPostService`، `EditorPostService`، `PublicPostQueries`، قرارداد `IPostRepository` و مدل‌های ورودی و خروجی |
+| `DataAccess/Posts` | پیکربندی EF Core و پیاده‌سازی `PostRepository` |
+| `DataAccess/Migrations` | فایل‌های ساخت و تغییر ساختار پایگاه داده |
+| `Api/Program.cs` | پیکربندی برنامه و تزریق وابستگی‌ها |
+| `Api/Authentication` | ورود آزمایشی مبتنی بر سرآیند و پیاده‌سازی `ICurrentUser` |
+| `Api/Posts` | مسیرهای نویسنده، ویراستار و عمومی، و تبدیل خطاها به ProblemDetails |
+| `Tests/Domain` | آزمون قواعد `Post` و انتقال‌های وضعیت |
+| `Tests/Application` | آزمون مجوزها و موارد کاربرد |
+| `Tests/Api` | آزمون‌های پذیرش HTTP براساس سناریوهای quickstart |
+
+جهت وابستگی پروژه‌ها:
+
+</div>
 
 ```text
 Core.Application   → Core.Domain
@@ -118,28 +144,33 @@ Endpoints.Api      → Core.Application, Infra.DataAccess
 Tests              → Core.Domain, Core.Application, Endpoints.Api
 ```
 
-**Structure Decision**: ساختار هدف Constitution بدون تغییر استفاده می‌شود. از آن فقط پروژه‌های موردنیاز
-این Feature ساخته می‌شوند. `Infra.AI` و `Infra.Qdrant` ساخته نمی‌شوند، چون این Feature قابلیت هوش
-مصنوعی ندارد (اصل V.3). همهٔ آزمون‌ها در یک پروژهٔ `BlogSpecLab.Tests` با پوشه‌های جدا قرار
-می‌گیرند.
+<div dir="rtl">
 
-## Complexity Tracking
+### تصمیم دربارهٔ ساختار
 
-هیچ نقض Constitution وجود ندارد؛ این بخش خالی است.
+ساختار هدف Constitution بدون تغییر استفاده می‌شود و فقط پروژه‌های موردنیاز این قابلیت ساخته
+می‌شوند. پروژه‌های `Infra.AI` و `Infra.Qdrant` ساخته نمی‌شوند، چون این قابلیت هوش مصنوعی ندارد
+(اصل V.3). همهٔ آزمون‌ها در یک پروژهٔ `BlogSpecLab.Tests` با پوشه‌های جداگانه قرار می‌گیرند.
+
+## پیگیری پیچیدگی
+
+هیچ نقضی از Constitution وجود ندارد؛ بنابراین موردی برای توجیه ثبت نمی‌شود.
 
 ## کاندیدهای Technical Baseline پروژه
 
-تصمیم‌های زیر اثر سراسری دارند و باید پیش از پذیرش توسط انسان بازبینی شوند (جزئیات در
-[research.md](./research.md)):
+تصمیم‌های زیر اثر سراسری دارند و باید پیش از پذیرش، توسط انسان بازبینی شوند. جزئیات هر کدام در
+[research.md](./research.md) آمده است.
 
 | شناسه | تصمیم |
 |-------|-------|
 | R-01 | سبک API: Minimal APIs |
 | R-02 | پایگاه داده: SQLite |
-| R-03 | دسترسی به داده: EF Core فقط در Infra.DataAccess |
-| R-04 | مدیریت Schema: EF Core Migrations |
-| R-05 | آزمون: xUnit و WebApplicationFactory با SQLite In-Memory |
-| R-06 | هویت: `ICurrentUser` در Application؛ Scheme مبتنی بر Header فقط در Development/Testing؛ سازوکار ورود واقعی بعداً تعیین می‌شود |
-| R-07 | قالب خطا: ProblemDetails با فیلد `code` |
-| R-08 | شناسه‌ها `Guid`؛ زمان UTC با `TimeProvider` |
-| R-09 | موارد کاربرد به‌صورت سرویس‌های ساده، بدون Mediator |
+| R-03 | دسترسی به داده: EF Core فقط در پروژهٔ DataAccess |
+| R-04 | مدیریت ساختار پایگاه داده: EF Core Migrations |
+| R-05 | آزمون: xUnit و WebApplicationFactory با SQLite درون‌حافظه‌ای |
+| R-06 | هویت کاربر از طریق `ICurrentUser`؛ ورود آزمایشی مبتنی بر سرآیند فقط در محیط توسعه و آزمون؛ روش ورود واقعی بعداً تعیین می‌شود |
+| R-07 | قالب خطا: ProblemDetails همراه با فیلد `code` |
+| R-08 | شناسه‌ها از نوع `Guid`؛ زمان به UTC و از طریق `TimeProvider` |
+| R-09 | موارد کاربرد به‌صورت سرویس‌های ساده و بدون Mediator |
+
+</div>
