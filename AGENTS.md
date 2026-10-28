@@ -19,6 +19,12 @@ Specification-Driven Development (SDD) و Spec Kit توسعه پیدا می‌ک
   فایل باید بررسی شود.
 - قواعد Constitution در این فایل تکرار نمی‌شوند؛ همیشه به خود Constitution مراجعه کن.
 
+### Technical Baseline
+
+- مرجع تصمیم‌های فنی سراسری و تثبیت‌شدهٔ پروژه: `docs/architecture/technical-baseline.md`
+- پیش از اجرای Plan، ایجاد Integration جدید یا هر تصمیم فنی سراسری، این سند باید بررسی شود.
+- تغییر تصمیم‌های Baseline فقط پس از ثبت پیشنهاد تغییر، بررسی اثر آن و تأیید مرجع مسئول مجاز است.
+
 ### Feature Specifications
 
 - Specificationها و سایر Artifactهای هر Feature در ساختاری که Spec Kit ایجاد می‌کند نگهداری
