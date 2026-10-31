@@ -162,7 +162,7 @@
 ### آزمون‌های User Story 3
 
 - [ ] T049 [P] [US3] آزمون‌های Domain برای `Publish` فقط از `Approved` (به‌روزرسانی `LastPublishedAt`)، `Unpublish` به `Approved` (حفظ `LastPublishedAt`)، ویرایش `Approved` و `Published` فقط با تأیید پیامد و بازگشت به `Draft`، و رد حذف پس از اولین انتشار در `tests/BlogSpecLab.Tests/Domain/PostPublicationTests.cs`
-- [ ] T050 [P] [US3] آزمون‌های پذیرش HTTP برای سناریوهای ۸، ۱۰، ۱۲، ۱۳، ۱۴، ۱۵، ۱۷ (هر دو ترتیب انتشار و ویرایش به‌صورت قطعی)، ۱۸، ۱۹، ۲۴ و ۲۶ در quickstart.md، در `tests/BlogSpecLab.Tests/Api/PublicationTests.cs`
+- [ ] T050 [P] [US3] آزمون‌های پذیرش HTTP برای سناریوهای ۸، ۱۰، ۱۲، ۱۳، ۱۴، ۱۵، ۱۷ (هر دو ترتیب انتشار و ویرایش به‌صورت قطعی؛ در ترتیب «اول انتشار»، نبود پست در فهرست `Published` ویراستار و ثبت تغییر «منتشرشده» به «پیش‌نویس» توسط نویسنده در مسیر سابقه نیز بررسی شود)، ۱۸، ۱۹، ۲۴ و ۲۶ در quickstart.md، در `tests/BlogSpecLab.Tests/Api/PublicationTests.cs`
 - [ ] T051 [P] [US3] آزمون‌های پذیرش مسیرهای عمومی برای سناریوهای ۱۱ و ۲۷، ترتیب جدیدترین انتشار با `ManualTimeProvider`، پاسخ 404 یکسان برای پست ناموجود و منتشرنشده، دسترسی بدون Token، و 401 برای Token نامعتبر در `tests/BlogSpecLab.Tests/Api/PublicReadTests.cs`
 
 ### پیاده‌سازی User Story 3
