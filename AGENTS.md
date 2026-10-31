@@ -77,9 +77,10 @@ Specification-Driven Development (SDD) و Spec Kit توسعه پیدا می‌ک
 
 ## ۷. Build و Test
 
-- در وضعیت فعلی Repository هنوز Solution و پروژه‌های C# ایجاد نشده‌اند؛ بنابراین هنوز هیچ دستور
-  Build یا Test معتبری وجود ندارد.
-- پس از ایجاد Solution و پروژه‌های آزمون، دستورات معتبر Build و Test باید به این بخش اضافه شوند.
+- پیش‌نیاز: .NET 10 SDK.
+- Build: `dotnet build BlogSpecLab.slnx`
+- Test: `dotnet test BlogSpecLab.slnx`
+- هر دو دستور از ریشهٔ Repository اجرا می‌شوند.
 - برای فایل‌ها یا پروژه‌هایی که هنوز وجود ندارند دستور جعل نکن.
 
 ## ۸. تکامل AGENTS.md

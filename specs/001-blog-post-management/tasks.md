@@ -41,12 +41,12 @@
 
 **هدف:** ایجاد Solution و پروژه‌ها مطابق Constitution و plan.md.
 
-- [ ] T001 ایجاد `BlogSpecLab.slnx` در ریشه و پنج پروژه با هدف `net10.0`: کتابخانهٔ `src/01.Core/Domain/BlogSpecLab.Core.Domain.csproj`، کتابخانهٔ `src/01.Core/Application/BlogSpecLab.Core.Application.csproj`، کتابخانهٔ `src/02.Infra/DataAccess/BlogSpecLab.Infra.DataAccess.csproj`، وب `src/03.Endpoints/Api/BlogSpecLab.Endpoints.Api.csproj` و آزمون xUnit `tests/BlogSpecLab.Tests/BlogSpecLab.Tests.csproj`؛ همه به Solution اضافه شوند
-- [ ] T002 افزودن Project Referenceها دقیقاً مطابق plan.md: Application → Domain؛ DataAccess → Application و Domain؛ Api → Application و DataAccess؛ Tests → Domain، Application و Api (در فایل‌های `.csproj` همان پروژه‌ها)
-- [ ] T003 [P] افزودن بسته‌ها: `Microsoft.EntityFrameworkCore.Sqlite` به `src/02.Infra/DataAccess/BlogSpecLab.Infra.DataAccess.csproj`؛ `Microsoft.EntityFrameworkCore.Design` به `src/03.Endpoints/Api/BlogSpecLab.Endpoints.Api.csproj`؛ `Microsoft.AspNetCore.Mvc.Testing` به `tests/BlogSpecLab.Tests/BlogSpecLab.Tests.csproj`؛ هیچ بستهٔ دیگری اضافه نشود
-- [ ] T004 [P] ایجاد `Directory.Build.props` در ریشه با `Nullable` و `ImplicitUsings` فعال برای همهٔ پروژه‌ها
-- [ ] T005 [P] ایجاد یا تکمیل `.gitignore` در ریشه برای `bin/`، `obj/` و فایل‌های پایگاه دادهٔ محلی `*.db`
-- [ ] T006 اجرای `dotnet build BlogSpecLab.slnx` و `dotnet test BlogSpecLab.slnx` و پس از موفقیت، افزودن همین دو دستور به بخش ۷ فایل `AGENTS.md`
+- [X] T001 ایجاد `BlogSpecLab.slnx` در ریشه و پنج پروژه با هدف `net10.0`: کتابخانهٔ `src/01.Core/Domain/BlogSpecLab.Core.Domain.csproj`، کتابخانهٔ `src/01.Core/Application/BlogSpecLab.Core.Application.csproj`، کتابخانهٔ `src/02.Infra/DataAccess/BlogSpecLab.Infra.DataAccess.csproj`، وب `src/03.Endpoints/Api/BlogSpecLab.Endpoints.Api.csproj` و آزمون xUnit `tests/BlogSpecLab.Tests/BlogSpecLab.Tests.csproj`؛ همه به Solution اضافه شوند
+- [X] T002 افزودن Project Referenceها دقیقاً مطابق plan.md: Application → Domain؛ DataAccess → Application و Domain؛ Api → Application و DataAccess؛ Tests → Domain، Application و Api (در فایل‌های `.csproj` همان پروژه‌ها)
+- [X] T003 [P] افزودن بسته‌ها: `Microsoft.EntityFrameworkCore.Sqlite` به `src/02.Infra/DataAccess/BlogSpecLab.Infra.DataAccess.csproj`؛ `Microsoft.EntityFrameworkCore.Design` به `src/03.Endpoints/Api/BlogSpecLab.Endpoints.Api.csproj`؛ `Microsoft.AspNetCore.Mvc.Testing` به `tests/BlogSpecLab.Tests/BlogSpecLab.Tests.csproj`؛ هیچ بستهٔ دیگری اضافه نشود
+- [X] T004 [P] ایجاد `Directory.Build.props` در ریشه با `Nullable` و `ImplicitUsings` فعال برای همهٔ پروژه‌ها
+- [X] T005 [P] ایجاد یا تکمیل `.gitignore` در ریشه برای `bin/`، `obj/` و فایل‌های پایگاه دادهٔ محلی `*.db`
+- [X] T006 اجرای `dotnet build BlogSpecLab.slnx` و `dotnet test BlogSpecLab.slnx` و پس از موفقیت، افزودن همین دو دستور به بخش ۷ فایل `AGENTS.md`
 
 **نقطهٔ بررسی:** Solution بدون خطا ساخته می‌شود و جهت وابستگی‌ها با Constitution (اصل II) منطبق است.
 
