@@ -105,6 +105,7 @@ If-Match: "6f1c2b0e-3d4a-4f7e-9a51-2c8d0b7e4a11"
 | `AuthorPostDetail` (جزئیات پست برای نویسنده) | فیلدهای خلاصه به‌علاوهٔ `body` و `createdAt` |
 | `EditorPostSummary` (خلاصهٔ پست برای ویراستار) | `id`، `title`، `authorDisplayName`، `status`، `lastModifiedAt`، `lastPublishedAt` (اختیاری)، `version` |
 | `EditorPostDetail` (جزئیات پست برای ویراستار) | فیلدهای خلاصه به‌علاوهٔ `body`، `authorId`، `createdAt` و `history` |
+| `EditorPostHistory` (سابقهٔ پست برای ویراستار) | `id`، `status` و `history`؛ بدون عنوان و متن پست |
 | `PublicPostSummary` (خلاصهٔ پست برای خواننده) | `id`، `title`، `authorDisplayName`، `publishedAt` |
 | `PublicPostDetail` (جزئیات پست برای خواننده) | فیلدهای خلاصه به‌علاوهٔ `body` |
 
@@ -137,13 +138,15 @@ If-Match: "6f1c2b0e-3d4a-4f7e-9a51-2c8d0b7e4a11"
 پیشوند مسیرها: `/api/editor/posts`
 
 همهٔ این مسیرها به نقش ویراستار نیاز دارند. پست‌های «پیش‌نویس» و «بازگشت برای اصلاح» از این مسیرها
-404 می‌گیرند. همهٔ اقدام‌ها سرآیند `If-Match` با نسخهٔ دیده‌شده را الزامی دارند (R-11)؛ از دو تصمیم
+404 می‌گیرند؛ تنها استثنا مسیر سابقه است که سابقهٔ وضعیت پست را در هر وضعیتی، بدون عنوان و متن آن،
+برمی‌گرداند (FR-011). همهٔ اقدام‌ها سرآیند `If-Match` با نسخهٔ دیده‌شده را الزامی دارند (R-11)؛ از دو تصمیم
 هم‌زمان، دومی 412 می‌گیرد (FR-014).
 
 | اقدام | متد و مسیر | بدنهٔ درخواست | پاسخ موفق | خطاهای خاص | مرجع |
 |-------|------------|---------------|-----------|-------------|------|
 | فهرست براساس وضعیت | `GET /api/editor/posts?status=...` | — | 200 و فهرست `EditorPostSummary` | 400 برای وضعیت نامعتبر | FR-007، FR-015 |
 | مشاهدهٔ پست و سابقه | `GET /api/editor/posts/{id}` | — | 200 و `EditorPostDetail` | 404 | FR-011 |
+| مشاهدهٔ سابقهٔ پست در هر وضعیت | `GET /api/editor/posts/{id}/history` | — | 200 و `EditorPostHistory` | 404 فقط برای پست ناموجود | FR-011 |
 | تأیید | `POST /api/editor/posts/{id}/approve` + `If-Match` | — | 200 و `EditorPostDetail` | 403 با `SelfApprovalNotAllowed`؛ 404؛ 409؛ 412؛ 428 | FR-007، FR-013، FR-014 |
 | بازگرداندن | `POST /api/editor/posts/{id}/return` + `If-Match` | `reason` | 200 و `EditorPostDetail` | 400 با `ReturnReasonRequired`؛ 404؛ 409؛ 412؛ 428 | FR-007، FR-014 |
 | انتشار | `POST /api/editor/posts/{id}/publish` + `If-Match` | — | 200 و `EditorPostDetail` | 404؛ 409؛ 412؛ 428 | FR-008، FR-013 |
