@@ -59,34 +59,34 @@
 
 ### قراردادهای Application
 
-- [ ] T007 [P] تعریف `ICurrentUser` با `IsAuthenticated` و `UserId` (بدون نقش) در `src/01.Core/Application/Common/ICurrentUser.cs` (R-06)
-- [ ] T008 [P] تعریف `Role` (`Author`، `Editor`)، رکورد `UserAccess` و قرارداد `IUserAccessReader` در `src/01.Core/Application/Common/UserAccess.cs` (data-model.md)
-- [ ] T009 [P] تعریف قرارداد `IAccessTokenReader` که Token خام را به شناسهٔ کاربر فعال تبدیل می‌کند در `src/01.Core/Application/Common/IAccessTokenReader.cs` (R-18، R-19)
-- [ ] T010 [P] تعریف نوع نتیجهٔ Application مستقل از HTTP و فهرست ثابت کدهای خطا (`NotFound`، `Forbidden`، `Unauthenticated`، `StaleVersion`، `ConfirmationRequired`، `InvalidStatusTransition`، `DeleteNotAllowed`، `SelfApprovalNotAllowed`، `InvalidTitle`، `InvalidBody`، `ReturnReasonRequired`) همراه با `currentStatus` و `currentVersion` اختیاری در `src/01.Core/Application/Common/Result.cs`
-- [ ] T011 [P] تعریف `ConcurrencyConflictException` در `src/01.Core/Application/Common/ConcurrencyConflictException.cs` تا Repositoryها خطای هم‌زمانی EF Core را بدون نشت جزئیات EF به Application گزارش کنند
+- [X] T007 [P] تعریف `ICurrentUser` با `IsAuthenticated` و `UserId` (بدون نقش) در `src/01.Core/Application/Common/ICurrentUser.cs` (R-06)
+- [X] T008 [P] تعریف `Role` (`Author`، `Editor`)، رکورد `UserAccess` و قرارداد `IUserAccessReader` در `src/01.Core/Application/Common/UserAccess.cs` (data-model.md)
+- [X] T009 [P] تعریف قرارداد `IAccessTokenReader` که Token خام را به شناسهٔ کاربر فعال تبدیل می‌کند در `src/01.Core/Application/Common/IAccessTokenReader.cs` (R-18، R-19)
+- [X] T010 [P] تعریف نوع نتیجهٔ Application مستقل از HTTP و فهرست ثابت کدهای خطا (`NotFound`، `Forbidden`، `Unauthenticated`، `StaleVersion`، `ConfirmationRequired`، `InvalidStatusTransition`، `DeleteNotAllowed`، `SelfApprovalNotAllowed`، `InvalidTitle`، `InvalidBody`، `ReturnReasonRequired`) همراه با `currentStatus` و `currentVersion` اختیاری در `src/01.Core/Application/Common/Result.cs`
+- [X] T011 [P] تعریف `ConcurrencyConflictException` در `src/01.Core/Application/Common/ConcurrencyConflictException.cs` تا Repositoryها خطای هم‌زمانی EF Core را بدون نشت جزئیات EF به Application گزارش کنند
 
 ### DataAccess
 
-- [ ] T012 [P] ایجاد مدل‌های ذخیره‌سازی کاربر، نقش و Token و پیکربندی EF Core آن‌ها (کلید ترکیبی نقش، Index یکتا روی `TokenHash`، نقش به‌صورت متن) در `src/02.Infra/DataAccess/Identity/IdentityRecords.cs` و `src/02.Infra/DataAccess/Identity/IdentityConfiguration.cs`
-- [ ] T013 ایجاد `BlogSpecLabDbContext` با جدول‌های `Users`، `UserRoles` و `AccessTokens` در `src/02.Infra/DataAccess/BlogSpecLabDbContext.cs` (وابسته به T012)
-- [ ] T014 [P] پیاده‌سازی `UserAccessReader` که نام، فعال بودن و نقش‌های فعلی را در هر فراخوانی از پایگاه داده می‌خواند در `src/02.Infra/DataAccess/Identity/UserAccessReader.cs`
-- [ ] T015 [P] پیاده‌سازی `AccessTokenReader`: محاسبهٔ SHA-256، جست‌وجو، بررسی انقضا با `TimeProvider` و فعال بودن کاربر، بدون ثبت Token در Log در `src/02.Infra/DataAccess/Identity/AccessTokenReader.cs`
-- [ ] T016 [P] پیاده‌سازی `LocalProvisioner` برای ساخت کاربر با نقش‌ها و صدور Token (۳۲ بایت تصادفی با `RandomNumberGenerator`، کدگذاری base64url، ذخیرهٔ فقط Hash، انقضای اختیاری، برگرداندن Token خام فقط یک بار) در `src/02.Infra/DataAccess/Identity/LocalProvisioner.cs` (R-20)
-- [ ] T017 افزودن متد ثبت سرویس‌های DataAccess (DbContext با Connection String، `UserAccessReader`، `AccessTokenReader`، `LocalProvisioner`) در `src/02.Infra/DataAccess/DependencyInjection.cs`
-- [ ] T018 ایجاد Migration اولیهٔ جدول‌های هویت با نام `InitialIdentity` در `src/02.Infra/DataAccess/Migrations/`
+- [X] T012 [P] ایجاد مدل‌های ذخیره‌سازی کاربر، نقش و Token و پیکربندی EF Core آن‌ها (کلید ترکیبی نقش، Index یکتا روی `TokenHash`، نقش به‌صورت متن) در `src/02.Infra/DataAccess/Identity/IdentityRecords.cs` و `src/02.Infra/DataAccess/Identity/IdentityConfiguration.cs`
+- [X] T013 ایجاد `BlogSpecLabDbContext` با جدول‌های `Users`، `UserRoles` و `AccessTokens` در `src/02.Infra/DataAccess/BlogSpecLabDbContext.cs` (وابسته به T012)
+- [X] T014 [P] پیاده‌سازی `UserAccessReader` که نام، فعال بودن و نقش‌های فعلی را در هر فراخوانی از پایگاه داده می‌خواند در `src/02.Infra/DataAccess/Identity/UserAccessReader.cs`
+- [X] T015 [P] پیاده‌سازی `AccessTokenReader`: محاسبهٔ SHA-256، جست‌وجو، بررسی انقضا با `TimeProvider` و فعال بودن کاربر، بدون ثبت Token در Log در `src/02.Infra/DataAccess/Identity/AccessTokenReader.cs`
+- [X] T016 [P] پیاده‌سازی `LocalProvisioner` برای ساخت کاربر با نقش‌ها و صدور Token (۳۲ بایت تصادفی با `RandomNumberGenerator`، کدگذاری base64url، ذخیرهٔ فقط Hash، انقضای اختیاری، برگرداندن Token خام فقط یک بار) در `src/02.Infra/DataAccess/Identity/LocalProvisioner.cs` (R-20)
+- [X] T017 افزودن متد ثبت سرویس‌های DataAccess (DbContext با Connection String، `UserAccessReader`، `AccessTokenReader`، `LocalProvisioner`) در `src/02.Infra/DataAccess/DependencyInjection.cs`
+- [X] T018 ایجاد Migration اولیهٔ جدول‌های هویت با نام `InitialIdentity` در `src/02.Infra/DataAccess/Migrations/`
 
 ### Api
 
-- [ ] T019 [P] پیاده‌سازی `OpaqueTokenAuthenticationHandler`: خواندن `Authorization: Bearer`، فراخوانی `IAccessTokenReader`، تولید فقط Claim شناسهٔ کاربر، و شکست احراز هویت برای Token نامعتبر یا منقضی حتی در مسیرهای عمومی در `src/03.Endpoints/Api/Authentication/OpaqueTokenAuthenticationHandler.cs`
-- [ ] T020 [P] پیاده‌سازی `HttpCurrentUser` برای `ICurrentUser` از کاربر احرازشدهٔ درخواست در `src/03.Endpoints/Api/Authentication/HttpCurrentUser.cs`
-- [ ] T021 [P] پیاده‌سازی نگاشت نتیجهٔ Application به `ProblemDetails` با فیلد `code`، کدهای HTTP مطابق contracts/http-api.md، فیلدهای `currentStatus` و `currentVersion` برای 409 و 412، بدون محتوای پست یا جزئیات داخلی، و پاسخ 401 با `Unauthenticated` در `src/03.Endpoints/Api/Posts/ProblemDetailsMapping.cs`
-- [ ] T022 [P] پیاده‌سازی دستورهای خط فرمان `provision-user` و `issue-token` که فقط در محیط Development اجرا می‌شوند، Migration انجام نمی‌دهند و Token را فقط یک بار در خروجی چاپ می‌کنند در `src/03.Endpoints/Api/Provisioning/ProvisioningCommands.cs`
-- [ ] T023 تکمیل `src/03.Endpoints/Api/Program.cs`: ثبت `TimeProvider.System`، سرویس‌های DataAccess، Scheme احراز هویت پیش‌فرض، Authorization، ProblemDetails و اجرای دستورهای T022 به‌جای راه‌اندازی وب در صورت وجود آرگومان؛ بدون Migration یا ساخت داده هنگام Startup؛ افزودن `public partial class Program` برای آزمون (وابسته به T017 و T019 تا T022)
-- [ ] T024 [P] افزودن Connection String محلی `ConnectionStrings:BlogSpecLab` با مقدار `Data Source=blogspeclab.db` در `src/03.Endpoints/Api/appsettings.json` و تنظیمات توسعه در `src/03.Endpoints/Api/appsettings.Development.json`
+- [X] T019 [P] پیاده‌سازی `OpaqueTokenAuthenticationHandler`: خواندن `Authorization: Bearer`، فراخوانی `IAccessTokenReader`، تولید فقط Claim شناسهٔ کاربر، و شکست احراز هویت برای Token نامعتبر یا منقضی حتی در مسیرهای عمومی در `src/03.Endpoints/Api/Authentication/OpaqueTokenAuthenticationHandler.cs`
+- [X] T020 [P] پیاده‌سازی `HttpCurrentUser` برای `ICurrentUser` از کاربر احرازشدهٔ درخواست در `src/03.Endpoints/Api/Authentication/HttpCurrentUser.cs`
+- [X] T021 [P] پیاده‌سازی نگاشت نتیجهٔ Application به `ProblemDetails` با فیلد `code`، کدهای HTTP مطابق contracts/http-api.md، فیلدهای `currentStatus` و `currentVersion` برای 409 و 412، بدون محتوای پست یا جزئیات داخلی، و پاسخ 401 با `Unauthenticated` در `src/03.Endpoints/Api/Posts/ProblemDetailsMapping.cs`
+- [X] T022 [P] پیاده‌سازی دستورهای خط فرمان `provision-user` و `issue-token` که فقط در محیط Development اجرا می‌شوند، Migration انجام نمی‌دهند و Token را فقط یک بار در خروجی چاپ می‌کنند در `src/03.Endpoints/Api/Provisioning/ProvisioningCommands.cs`
+- [X] T023 تکمیل `src/03.Endpoints/Api/Program.cs`: ثبت `TimeProvider.System`، سرویس‌های DataAccess، Scheme احراز هویت پیش‌فرض، Authorization، ProblemDetails و اجرای دستورهای T022 به‌جای راه‌اندازی وب در صورت وجود آرگومان؛ بدون Migration یا ساخت داده هنگام Startup؛ افزودن `public partial class Program` برای آزمون (وابسته به T017 و T019 تا T022)
+- [X] T024 [P] افزودن Connection String محلی `ConnectionStrings:BlogSpecLab` با مقدار `Data Source=blogspeclab.db` در `src/03.Endpoints/Api/appsettings.json` و تنظیمات توسعه در `src/03.Endpoints/Api/appsettings.Development.json`
 
 ### زیرساخت آزمون
 
-- [ ] T025 [P] پیاده‌سازی `ManualTimeProvider` قابل تنظیم برای آزمون‌های وابسته به زمان در `tests/BlogSpecLab.Tests/Api/Infrastructure/ManualTimeProvider.cs`
+- [X] T025 [P] پیاده‌سازی `ManualTimeProvider` قابل تنظیم برای آزمون‌های وابسته به زمان در `tests/BlogSpecLab.Tests/Api/Infrastructure/ManualTimeProvider.cs`
 - [ ] T026 پیاده‌سازی `BlogSpecLabApiFactory` بر پایهٔ `WebApplicationFactory<Program>` با محیط `Testing`، SQLite درون‌حافظه‌ای با اتصال باز، `EnsureCreated` و جایگزینی `TimeProvider`؛ به‌همراه `TestUsers` برای ساخت مستقیم کاربران، نقش‌ها و Tokenهای نمونه (نویسندهٔ الف، نویسندهٔ ب، ویراستار ۱، ویراستار ۲) و ساخت `HttpClient` با Token هر کاربر در `tests/BlogSpecLab.Tests/Api/Infrastructure/BlogSpecLabApiFactory.cs` و `tests/BlogSpecLab.Tests/Api/Infrastructure/TestUsers.cs`
 
 **نقطهٔ بررسی:** برنامه بالا می‌آید، دستور `provision-user` روی پایگاه دادهٔ Migrateشده کار می‌کند و
