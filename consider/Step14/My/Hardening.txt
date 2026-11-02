@@ -1,0 +1,201 @@
+`/speckit-implement`
+
+پیاده‌سازی Feature فعال `001-blog-post-management` را از وضعیت فعلی ادامه بده.
+
+در این اجرا فقط **فاز ۵ — User Story 3: انتشار پست تأییدشده و مشاهده توسط خوانندگان** از `tasks.md` را انجام بده.
+
+فقط وظایف زیر مجاز به اجرا هستند:
+
+- T049، T050، T051 و T062 (آزمون‌های User Story 3)
+- T052 تا T057 (پیاده‌سازی User Story 3)
+
+هیچ Task دیگری را آغاز نکن.
+
+## هدف این فاز
+
+در پایان این اجرا باید ثابت شود که انتشار فقط از مسیر مصوب انجام می‌شود و سیستم علاوه بر Happy Path، در نسخهٔ قدیمی، تعارض هم‌زمان هنگام ذخیره، نبود `If-Match` و دسترسی عمومی نیز رفتار مصوب را حفظ می‌کند.
+
+قابلیت‌های اصلی این فاز:
+
+- انتشار فقط از `Approved` و خارج‌کردن از انتشار به `Approved` بدون تأیید مجدد
+- مشاهدهٔ عمومی فقط برای پست‌های `Published`، بدون افشای پست‌های منتشرنشده
+- ویرایش پست `Approved` یا `Published` توسط نویسنده فقط با تأیید پیامد و بازگشت به `Draft` (FR-012)
+- تلاش دوبارهٔ یک‌باره فقط برای ویرایش نویسنده هنگام تعارض هم‌زمان (R-11، U4)
+- `StaleVersion` بدون تلاش دوباره برای انتشار و خارج‌کردن از انتشار (FR-014)
+- ثبات قواعد حذف پست قبلاً منتشرشده
+
+## نحوهٔ اجرا
+
+1. وضعیت فعلی `tasks.md` را بررسی کن و تأیید کن T001 تا T048 قبلاً تکمیل شده‌اند.
+
+2. Artifactهای تأییدشدهٔ Feature (`spec.md`، `plan.md`، `research.md`، `data-model.md`، `contracts/http-api.md`، `quickstart.md`)، Constitution، Technical Baseline و `AGENTS.md` را مطابق Workflow پروژه رعایت کن.
+
+3. ترتیب وابستگی‌های ثبت‌شده در `tasks.md` را حفظ کن:
+   - ابتدا T049، T050، T051 و T062 (قابل اجرای موازی) نوشته و اجرا شوند و پیش از پیاده‌سازی شکست بخورند.
+   - برای اجرای شکست رفتاری فقط اسکلت حداقلی امضاهای لازم را بساز؛ شکست رفتاری واقعی را از خطای صرفاً کامپایل جدا گزارش کن.
+   - T052 و T055 قابل اجرای هم‌زمان‌اند.
+   - T053 و T054 پس از T052 انجام شوند.
+   - T056 پس از T054 انجام شود.
+   - T057 پس از T055 انجام شود.
+
+## آزمون‌ها (T049، T050، T051 و T062)
+
+### T049 — Domain
+
+در `tests/BlogSpecLab.Tests/Domain/PostPublicationTests.cs` مطابق جدول انتقال‌های `data-model.md`:
+
+- `Publish` فقط از `Approved` و به‌روزرسانی `LastPublishedAt`؛ انتشار هر وضعیت دیگر با `InvalidStatusTransition` رد شود و وضعیت تغییر نکند.
+- `Unpublish` فقط از `Published` به `Approved` و حفظ `LastPublishedAt` (R-17).
+- ویرایش `Approved` و `Published` فقط با تأیید پیامد و بازگشت به `Draft`.
+- رد حذف پست `Approved` و `Published` با `InvalidStatusTransition`، حتی اگر قبلاً منتشر شده باشد.
+- رد حذف پیش‌نویسِ قبلاً منتشرشده با `DeleteNotAllowed`.
+- ثبت انجام‌دهنده، زمان، وضعیت قبلی و جدید در سابقه و `Version` تازه برای هر انتقال.
+
+### T050 — پذیرش HTTP انتشار
+
+در `tests/BlogSpecLab.Tests/Api/PublicationTests.cs` سناریوهای ۸، ۱۰، ۱۲، ۱۳، ۱۴، ۱۵، ۱۷، ۱۸، ۱۹، ۲۴ و ۲۶ در `quickstart.md`، به‌علاوهٔ حذف پست `Approved` و `Published` (409 با `InvalidStatusTransition`).
+
+- سناریوی ۱۷: هر دو ترتیب پشت‌سرهم انتشار و ویرایش را به‌صورت قطعی بررسی کن؛ تعارض هم‌زمان هنگام ذخیره فقط در T062 آزموده می‌شود. در ترتیب «اول انتشار»، نبود پست در فهرست `Published` ویراستار و ثبت تغییر «منتشرشده» به «پیش‌نویس» توسط نویسنده در مسیر سابقه نیز بررسی شود.
+- ترتیب بررسی موجود حفظ شود: نقش (403) → قابل مشاهده بودن برای ویراستار (404) → نسخه (412) → وضعیت (409). برای سناریوهای ۱۰ و ۲۶ پستی را به کار ببر که برای ویراستار قابل مشاهده است (مثلاً `InReview`)؛ انتشار پست `Draft` یا `Returned` طبق R-13 پاسخ 404 دارد.
+- بخش انتشار سناریوی ۹ (نویسندهٔ بدون نقش ویراستار می‌خواهد منتشر کند → 403) را در همین فایل تکمیل کن.
+- در همهٔ موارد ردشده بررسی کن که وضعیت و نسخهٔ پست تغییر نکرده و پاسخ 409 و 412 محتوای پست را ندارد.
+
+### T051 — پذیرش مسیرهای عمومی
+
+در `tests/BlogSpecLab.Tests/Api/PublicReadTests.cs`:
+
+- سناریوهای ۱۱ و ۲۷.
+- ترتیب جدیدترین انتشار اول با `ManualTimeProvider`.
+- فقط فیلدهای `PublicPostSummary` (`id`، `title`، `authorDisplayName`، `publishedAt`) و `PublicPostDetail` (به‌علاوهٔ `body`)؛ بدون `ETag`، `version`، `status`، شناسهٔ نویسنده، سابقه یا دلیل بازگشت.
+- پاسخ 404 یکسان (کد و بدنه) برای پست ناموجود و پست منتشرنشده در هر وضعیت، از جمله پست خارج‌شده از انتشار.
+- دسترسی بدون Token.
+- 401 با `Unauthenticated` برای Token نامعتبر حتی در مسیر عمومی.
+
+### T062 — تعارض هم‌زمان در Application
+
+در `tests/BlogSpecLab.Tests/Application/ConcurrencyConflictTests.cs` با یک `IPostRepository` جعلی دست‌نویس (بدون بستهٔ جدید) که در ذخیره تغییر کاربر دیگر را شبیه‌سازی می‌کند و `ConcurrencyConflictException` گزارش می‌دهد:
+
+- ویرایش نویسنده با تأیید پیامد، پس از انتشار هم‌زمان ویراستار، یک بار دوباره خوانده و اجرا می‌شود و پست `Draft` می‌شود (FR-012).
+- انتشار ویراستار پس از ویرایش هم‌زمان نویسنده بدون تلاش دوباره نتیجهٔ `StaleVersion` می‌گیرد و هیچ تغییری ذخیره نمی‌شود (FR-014، R-11).
+- اگر هر دو ذخیره `ConcurrencyConflictException` بدهند، ویرایش نویسنده دقیقاً یک بار دوباره اجرا می‌شود و سپس `StaleVersion` با `currentStatus` و `currentVersion` می‌گیرد و هیچ تغییری ذخیره نمی‌شود (U4، research.md R-11).
+- از `sleep` یا زمان‌بندی واقعی برای هماهنگی آزمون استفاده نکن؛ ترتیب با Repository جعلی قطعی شود.
+
+## Domain (T052)
+
+- `Publish` و `Unpublish` و ویرایش `Approved`/`Published` با تأیید پیامد را به `src/01.Core/Domain/Posts/Post.cs` اضافه کن.
+- هر انتقال یک `StatusChange` با انجام‌دهنده، نام او، زمان، وضعیت قبلی و جدید ثبت کند و `LastModifiedAt` و `Version` تازه بگیرد؛ زمان از بیرون به متد داده شود.
+- انتشار توسط ویراستاری که نویسندهٔ پست است مجاز است (FR-013)؛ فقط تأیید آن ممنوع است.
+- هر انتقال دیگری با `InvalidStatusTransition` رد شود و وضعیت تغییر نکند.
+
+## Application (T053 تا T055)
+
+### T053 — ویرایش نویسنده
+
+- ویرایش `Approved` یا `Published` بدون `confirmRevertToDraft` نتیجهٔ `ConfirmationRequired` بدهد و هیچ تغییری ذخیره نشود.
+- در صورت `ConcurrencyConflictException`، پست یک بار دوباره خوانده و قاعدهٔ Domain دوباره اجرا شود (R-11، FR-012).
+- اگر ذخیرهٔ تلاش دوباره هم `ConcurrencyConflictException` بدهد، بدون تلاش دیگر `StaleVersion` با وضعیت و نسخهٔ فعلی برگردانده شود.
+- این تلاش دوباره فقط مخصوص ویرایش نویسنده است و به هیچ فرمان دیگری تعمیم داده نشود.
+
+### T054 — انتشار و خارج‌کردن از انتشار
+
+- به `src/01.Core/Application/Posts/EditorPostService.cs` با نسخهٔ مورد انتظار اضافه شود.
+- نقش ویراستار در هر فراخوانی از `IUserAccessReader` خوانده شود؛ بدون Cache.
+- همان ترتیب بررسی و قواعد قابل مشاهده بودن موجود (`VisibleStatuses`) به کار رود.
+- نسخهٔ قدیمی یا `ConcurrencyConflictException` بدون تلاش دوباره نتیجهٔ `StaleVersion` با `currentStatus` و `currentVersion` بدهد.
+- تغییر Post و `StatusChange` مربوط در یک فراخوانی ذخیره در `IPostRepository` ثبت شوند.
+
+### T055 — خواندن عمومی
+
+- `PublicPostSummary` و `PublicPostDetail` را در `src/01.Core/Application/Posts/PublicPostModels.cs` تعریف کن.
+- `PublicPostQueries` را در `src/01.Core/Application/Posts/PublicPostQueries.cs` پیاده‌سازی کن: فقط `Published`، مرتب براساس `LastPublishedAt` نزولی، بدون نسخه.
+- از متد فهرست منتشرشده‌های `IPostRepository` استفاده کن؛ Reader یا Repository جدیدی نساز.
+- پست منتشرنشده یا ناموجود نتیجهٔ `NotFound` یکسان بدهد.
+- Endpoint عمومی نباید برای نمایش داده مستقیم سراغ Domain یا DataAccess برود؛ مسیر Application حفظ شود.
+
+## Persistence
+
+- Schema فعلی (`Posts` با `LastPublishedAt` و `PostStatusChanges`) باید برای این فاز کافی باشد؛ Migration جدید ایجاد نکن.
+- اگر واقعاً نیاز به تغییر Schema پیدا شد، متوقف شو و گزارش بده.
+- زمان‌ها همچنان به‌صورت UTC ticks ذخیره می‌شوند تا SQLite بتواند براساس `LastPublishedAt` مرتب کند.
+- Migrationها را روی پایگاه داده اعمال نکن (اعمال آن‌ها T060 است).
+
+## API (T056 و T057)
+
+فقط مسیرهای زیر را مطابق `contracts/http-api.md` ایجاد کن:
+
+- `POST /api/editor/posts/{id}/publish` با `If-Match`
+- `POST /api/editor/posts/{id}/unpublish` با `If-Match`
+- `GET /api/posts` بدون نیاز به ورود و بدون `ETag`
+- `GET /api/posts/{id}` بدون نیاز به ورود و بدون `ETag`
+
+- از `ETagHeaders` (T039) برای `ETag`، 428 و 400 با `InvalidIfMatch` استفاده کن.
+- تبدیل نتیجه به `ProblemDetails` فقط با نگاشت موجود Api انجام شود.
+- Business Logic را در Endpoint تکرار نکن.
+
+## مرزهای معماری
+
+- Core نباید به EF Core، ASP.NET Core یا جزئیات HTTP وابسته شود.
+- `DbContext` و `IQueryable` نباید به Application یا Domain نشت کنند.
+- DataAccess مسئول تصمیم کسب‌وکاری جدید نباشد.
+- Client، Header یا بدنهٔ درخواست نباید بتواند نقش، مالکیت، وضعیت یا انجام‌دهنده را تعیین کند.
+- Authentication به‌تنهایی نقش ایجاد نکند؛ نقش جاری در هر عملیات دوباره خوانده شود.
+- `currentStatus` و `currentVersion` فقط برای کاربری برگردانده شوند که به پست دسترسی دارد؛ محتوای پست در پاسخ 409 و 412 قرار نگیرد.
+- Project Referenceها مطابق Constitution (اصل II) باقی بمانند.
+
+## Build و Test
+
+پیش از اجرای هر دستور ترمینال از کاربر اجازه بگیر.
+
+پس از تکمیل T049 تا T057 و T062:
+
+1. `dotnet build BlogSpecLab.slnx` را اجرا کن.
+2. `dotnet test BlogSpecLab.slnx` را اجرا کن؛ همهٔ آزمون‌های Foundation، US1 و US2 نیز برای Regression باید موفق باشند.
+3. بررسی کن پاسخ‌های عمومی هیچ دادهٔ مدیریتی، نسخه یا اطلاعات پست منتشرنشده را افشا نمی‌کنند.
+4. بررسی کن انتشار وضعیت غیر `Approved`، انتشار بدون `If-Match` و انتشار با نسخهٔ قدیمی بدون اثر جزئی رد می‌شوند.
+5. بررسی کن تلاش دوباره فقط در ویرایش نویسنده و دقیقاً یک بار انجام می‌شود.
+6. Project Referenceها را دوباره با Constitution (اصل II) بررسی کن.
+7. بررسی کن هیچ Package جدید، Secret یا وابستگی AI، MCP، RAG یا Qdrant اضافه نشده باشد.
+
+## مدیریت tasks.md
+
+فقط Taskهایی از T049 تا T057 و T062 را که واقعاً تکمیل و بررسی شده‌اند از `[ ]` به `[X]` تغییر بده.
+
+Task ناقص را تکمیل‌شده اعلام نکن. T058 و Taskهای بعدی را `[X]` نکن، حتی اگر بررسی‌های مشابه آن‌ها انجام شده باشد.
+
+## محدودیت Scope
+
+در این اجرا:
+
+- T058 و Taskهای بعدی را آغاز نکن.
+- quickstart را نهایی نکن و Migration را اعمال نکن.
+- مفاهیم خارج از Artifactها مانند `ReviewDecision`، `ContentRevision`، `PublicationInfo`، `PublicPostView`، `PublicPostService`، `PublicPostReader`، `IWriteSession`، `CanReview`/`CanPublish` یا `allowedActions` ایجاد نکن.
+- Publish تکراری Idempotent (200 برای پست قبلاً منتشرشده) ایجاد نکن؛ طبق قرارداد، انتشار پست `Published` پاسخ 409 با `InvalidStatusTransition` دارد.
+- کد `503`/`storage_unavailable`، کدهای snake_case یا کد خطای جدید خارج از `contracts/http-api.md` ایجاد نکن.
+- آزمون رقابت Provider-level با SQLite فایل‌محور و دو DbContext ایجاد نکن؛ تعارض هم‌زمان فقط با Repository جعلی T062 آزموده می‌شود.
+- سازوکار لغو Token یا مجوز جدید ایجاد نکن؛ حذف Token و نقش از پایگاه داده (سناریوهای ۲۲ و ۲۳) قبلاً پوشش داده شده‌اند.
+- فایل آزمونی خارج از T049، T050، T051 و T062 ایجاد نکن.
+- AI، MCP، RAG، Qdrant یا Agent اضافه نکن.
+- تصمیم فنی جدید خارج از Plan و Research اتخاذ نکن.
+- `spec.md` را تغییر نده و پوشهٔ `Prompts/` را تغییر نده.
+- Artifactهای SDD را فقط در صورت نیاز مستقیم همین Taskها تغییر بده.
+
+اگر برای تکمیل یکی از Taskها نیاز به تغییر Spec، Plan، Contract یا Taskها پیدا شد، همان‌جا متوقف شو و مسئله را گزارش کن.
+
+## گزارش پایان
+
+در پایان گزارش کن:
+
+1. وضعیت T049 تا T057 و T062 به تفکیک.
+2. فایل‌های ایجاد یا تغییرکرده.
+3. انتقال‌های وضعیت جدید و کدهای خطای هرکدام.
+4. مسیرهای ایجادشده (انتشار، خارج‌کردن از انتشار و عمومی).
+5. نحوهٔ جلوگیری از افشای پست منتشرنشده در مسیرهای عمومی.
+6. رفتار ویرایش `Approved`/`Published` با و بدون تأیید پیامد.
+7. رفتار تعارض هم‌زمان: تلاش دوبارهٔ ویرایش نویسنده و `StaleVersion` انتشار.
+8. تأیید عدم نیاز به Migration جدید.
+9. نتیجهٔ Build و Test و تعداد Passed / Failed / Skipped.
+10. Taskهایی که `[X]` شده‌اند.
+11. هر مشکل یا بدهی فنی باقی‌مانده.
+12. تأیید کن که T058 یا Taskهای بعدی آغاز نشده‌اند.
+
+پس از گزارش متوقف شو و منتظر دستور بعدی بمان.
