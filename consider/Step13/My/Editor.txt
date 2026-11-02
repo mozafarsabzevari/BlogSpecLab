@@ -1,0 +1,137 @@
+`/speckit-implement`
+
+پیاده‌سازی Feature فعال `001-blog-post-management` را از وضعیت فعلی ادامه بده.
+
+در این اجرا فقط **فاز ۴ — User Story 2: ارسال برای بررسی و تصمیم ویراستار** از `tasks.md` را انجام بده.
+
+فقط وظایف زیر مجاز به اجرا هستند:
+
+- T041 و T042 (آزمون‌های User Story 2)
+- T043 تا T048 (پیاده‌سازی User Story 2)
+
+هیچ Task دیگری را آغاز نکن.
+
+## نحوهٔ اجرا
+
+1. وضعیت فعلی `tasks.md` را بررسی کن و تأیید کن T001 تا T040 قبلاً تکمیل شده‌اند.
+
+2. Artifactهای تأییدشدهٔ Feature (`spec.md`، `plan.md`، `research.md`، `data-model.md`، `contracts/http-api.md`، `quickstart.md`)، Constitution، Technical Baseline و `AGENTS.md` را مطابق Workflow پروژه رعایت کن.
+
+3. ترتیب وابستگی‌های ثبت‌شده در `tasks.md` را حفظ کن:
+   - ابتدا T041 و T042 (قابل اجرای موازی) نوشته و اجرا شوند و پیش از پیاده‌سازی شکست بخورند.
+   - شکست رفتاری واقعی را از خطای صرفاً کامپایل جدا گزارش کن.
+   - T043 و T045 قابل اجرای هم‌زمان‌اند.
+   - T044 پس از T043 انجام شود.
+   - T046 پس از T043 و T045 انجام شود.
+   - T047 پس از T044 انجام شود.
+   - T048 پس از T046 انجام شود.
+
+4. فقط ارسال و پس گرفتن توسط نویسنده، و فهرست، مشاهده، مشاهدهٔ سابقه، تأیید و بازگرداندن توسط ویراستار را پیاده‌سازی کن.
+
+5. هنوز هیچ رفتار انتشار، خارج‌کردن از انتشار یا مشاهدهٔ عمومی ایجاد نکن.
+
+## Domain (T043)
+
+مطابق جدول انتقال‌های `data-model.md`:
+
+- `Submit` فقط از `Draft` و `Returned` به `InReview`، با اعتبارسنجی دوبارهٔ عنوان و متن.
+- `Withdraw` فقط از `InReview` به `Draft`.
+- `Approve` فقط از `InReview` به `Approved`؛ اگر انجام‌دهنده نویسندهٔ پست باشد `SelfApprovalNotAllowed`.
+- `Return` فقط از `InReview` به `Returned`؛ دلیل خالی یا فقط whitespace با `ReturnReasonRequired` رد شود و `LastReturnReason` به‌روز شود.
+- ویراستاری که نویسندهٔ پست هم هست می‌تواند پست خودش را بازگرداند؛ فقط تأیید آن ممنوع است (FR-013).
+- هر انتقال یک `StatusChange` با انجام‌دهنده، نام او، زمان، وضعیت قبلی و جدید و دلیل (در صورت وجود) ثبت کند.
+- هر انتقال `LastModifiedAt` و `Version` تازه بگیرد؛ زمان از بیرون به متد داده شود.
+- هر انتقال دیگری با `InvalidStatusTransition` رد شود و وضعیت تغییر نکند.
+
+## Application (T044 تا T046)
+
+- نقش نویسنده یا ویراستار در هر فراخوانی از `IUserAccessReader` خوانده شود؛ بدون Cache.
+- تأیید تاریخی پس از تغییر بعدی نقش‌های تأییدکننده دوباره بررسی نشود؛ وضعیت `Approved` فقط با انتقال مجاز Domain تغییر می‌کند.
+- پست دیگران برای نویسنده `NotFound` باشد.
+- مسیر جزئیات ویراستار برای `Draft` و `Returned` نتیجهٔ `NotFound` بدهد؛ مسیر سابقه برای پست در هر وضعیت، بدون عنوان و متن، سابقه را برگرداند و فقط برای پست ناموجود `NotFound` بدهد (FR-011).
+- فهرست ویراستار فقط وضعیت‌های `InReview`، `Approved` و `Published` را بپذیرد.
+- نسخهٔ قدیمی یا تعارض هم‌زمان هنگام ذخیره (`ConcurrencyConflictException`) برای ارسال، پس گرفتن، تأیید و بازگرداندن بدون تلاش دوباره نتیجهٔ `StaleVersion` با `currentStatus` و `currentVersion` بدهد (R-11، FR-014).
+- تغییر Post و `StatusChange` مربوط در یک فراخوانی ذخیره در `IPostRepository` ثبت شوند.
+- ویرایش نویسنده و تلاش دوبارهٔ آن (T053) را تغییر نده.
+
+## Persistence
+
+- Schema فعلی (`Posts` با `LastReturnReason` و `PostStatusChanges` با `Reason`) برای این فاز کافی است؛ Migration جدید ایجاد نکن.
+- اگر واقعاً نیاز به تغییر Schema پیدا شد، متوقف شو و گزارش بده.
+- Migrationها را روی پایگاه داده اعمال نکن (اعمال آن‌ها T060 است).
+
+## API (T047 و T048)
+
+فقط مسیرهای زیر را مطابق `contracts/http-api.md` ایجاد کن:
+
+- `POST /api/author/posts/{id}/submit` با `If-Match`
+- `POST /api/author/posts/{id}/withdraw` با `If-Match`
+- `GET /api/editor/posts?status=...`
+- `GET /api/editor/posts/{id}`
+- `GET /api/editor/posts/{id}/history`
+- `POST /api/editor/posts/{id}/approve` با `If-Match`
+- `POST /api/editor/posts/{id}/return` با `If-Match` و بدنهٔ `reason`
+
+- از `ETagHeaders` (T039) برای `ETag`، 428 و 400 با `InvalidIfMatch` استفاده کن.
+- تبدیل نتیجه به `ProblemDetails` فقط با نگاشت موجود Api انجام شود.
+- Business Logic را در Endpoint تکرار نکن.
+
+## مرزهای معماری
+
+- Core نباید به EF Core، ASP.NET Core یا جزئیات HTTP وابسته شود.
+- `DbContext` و `IQueryable` نباید به Application یا Domain نشت کنند.
+- Client، Header یا بدنهٔ درخواست نباید بتواند نقش، مالکیت یا انجام‌دهنده را تعیین کند.
+- Project Referenceها مطابق Constitution (اصل II) باقی بمانند.
+
+## Build و Test
+
+پیش از اجرای هر دستور ترمینال از کاربر اجازه بگیر.
+
+پس از تکمیل T041 تا T048:
+
+1. `dotnet build BlogSpecLab.slnx` را اجرا کن.
+2. `dotnet test BlogSpecLab.slnx` را اجرا کن؛ همهٔ آزمون‌های Foundation و US1 نیز برای Regression باید موفق باشند.
+3. بررسی کن خودتأییدی در Domain، Application و HTTP قابل دور زدن نباشد.
+4. بررسی کن لغو بعدی نقش ویراستارِ تأییدکننده وضعیت `Approved` پست را تغییر ندهد.
+5. Project Referenceها را دوباره با Constitution (اصل II) بررسی کن.
+6. بررسی کن هیچ Package جدید، Secret یا وابستگی AI، MCP، RAG یا Qdrant اضافه نشده باشد.
+
+## مدیریت tasks.md
+
+فقط Taskهایی را که واقعاً تکمیل و بررسی شده‌اند از `[ ]` به `[X]` تغییر بده.
+
+Task ناقص را تکمیل‌شده اعلام نکن.
+
+## محدودیت Scope
+
+در این اجرا:
+
+- T049 و Taskهای بعدی را آغاز نکن.
+- `Publish`، `Unpublish` یا ویرایش `Approved` و `Published` با تأیید پیامد ایجاد نکن.
+- مسیرهای `publish`، `unpublish` یا مسیرهای عمومی `/api/posts` ایجاد نکن.
+- `PublicPostQueries` ایجاد نکن.
+- مفاهیم خارج از Artifactها مانند `ReviewDecision`، `ContentRevision`، Snapshot محتوا، `PublicationInfo`، `CanReview`/`CanPublish` یا `allowedActions` ایجاد نکن.
+- فایل آزمونی خارج از T041 و T042 ایجاد نکن.
+- تصمیم فنی جدید خارج از Plan و Research اتخاذ نکن.
+- `spec.md` را تغییر نده و پوشهٔ `Prompts/` را تغییر نده.
+- Artifactهای SDD را فقط در صورت نیاز مستقیم همین Taskها تغییر بده.
+
+اگر برای تکمیل یکی از Taskها نیاز به تغییر Spec، Plan یا Taskها پیدا شد، همان‌جا متوقف شو و مسئله را گزارش کن.
+
+## گزارش پایان
+
+در پایان گزارش کن:
+
+1. وضعیت T041 تا T048 به تفکیک.
+2. فایل‌های ایجاد یا تغییرکرده.
+3. انتقال‌های وضعیت جدید و کدهای خطای هرکدام.
+4. نحوهٔ جلوگیری از خودتأییدی در Domain، Application و HTTP.
+5. نحوهٔ بررسی نقش نویسنده و ویراستار و رفتار مسیر سابقه.
+6. مسیرهای ایجادشده.
+7. تأیید عدم نیاز به Migration جدید.
+8. نتیجهٔ Build و Test و تعداد Passed / Failed / Skipped.
+9. Taskهایی که `[X]` شده‌اند.
+10. هر مشکل یا بدهی فنی باقی‌مانده.
+11. تأیید کن که T049 یا Taskهای بعدی آغاز نشده‌اند.
+
+پس از گزارش متوقف شو و منتظر دستور بعدی بمان.
