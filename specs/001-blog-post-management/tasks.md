@@ -103,7 +103,7 @@
 
 ### آزمون‌های User Story 1
 
-- [ ] T027 [P] [US1] آزمون‌های Domain برای ایجاد پست (وضعیت `Draft`، ثبت سابقه با وضعیت قبلی خالی، `Version` جدید)، اعتبارسنجی عنوان و متن (Trim، خالی، ۲۰۰/۲۰۱ و ۵۰٬۰۰۰/۵۰٬۰۰۱ نویسه)، ویرایش در `Draft` و `Returned` با `Version` تازه، و اجازهٔ حذف فقط برای پست هرگز منتشرنشده در `tests/BlogSpecLab.Tests/Domain/PostDraftTests.cs`
+- [ ] T027 [P] [US1] آزمون‌های Domain برای ایجاد پست (وضعیت `Draft`، ثبت سابقه با وضعیت قبلی خالی، `Version` جدید)، اعتبارسنجی عنوان و متن (Trim، خالی، ۲۰۰/۲۰۱ و ۵۰٬۰۰۰/۵۰٬۰۰۱ نویسه)، ویرایش در `Draft` و `Returned` با `Version` تازه، و مجاز بودن حذف پیش‌نویس هرگز منتشرنشده (حالت‌های دیگر حذف در T041 و T049 آزموده می‌شوند) در `tests/BlogSpecLab.Tests/Domain/PostDraftTests.cs`
 - [ ] T028 [P] [US1] آزمون‌های پذیرش HTTP برای سناریوهای ۱، ۲، ۳، ۲۰ و ۲۳ در quickstart.md، به‌علاوهٔ: حذف پیش‌نویس هرگز منتشرنشده (204 و حذف از فهرست)، حذف بدون `If-Match` (428)، حذف با نسخهٔ قدیمی (412)، وجود `ETag` در پاسخ یک پست، و 403 برای کاربری که نقش نویسنده ندارد در `tests/BlogSpecLab.Tests/Api/AuthorDraftsTests.cs`
 
 ### پیاده‌سازی User Story 1
@@ -111,7 +111,7 @@
 - [ ] T029 [P] [US1] ایجاد `PostStatus` با پنج مقدار data-model.md در `src/01.Core/Domain/Posts/PostStatus.cs`
 - [ ] T030 [P] [US1] ایجاد موجودیت `StatusChange` (فقط‌افزودنی) در `src/01.Core/Domain/Posts/StatusChange.cs`
 - [ ] T031 [P] [US1] ایجاد `PostDomainException` با کد خطای ثابت در `src/01.Core/Domain/Posts/PostDomainException.cs`
-- [ ] T032 [US1] پیاده‌سازی Aggregate `Post` با `Create`، `Edit` برای `Draft` و `Returned` (رد در `InReview`)، `EnsureCanDelete`، `HasEverBeenPublished`، به‌روزرسانی `LastModifiedAt` و `Version` تازه در هر تغییر؛ زمان از بیرون به متدها داده می‌شود در `src/01.Core/Domain/Posts/Post.cs` (وابسته به T029 تا T031)
+- [ ] T032 [US1] پیاده‌سازی Aggregate `Post` با `Create`، `Edit` برای `Draft` و `Returned` (رد در `InReview`)، `EnsureCanDelete` (ابتدا وضعیت: فقط `Draft` و `Returned`، در غیر این صورت `InvalidStatusTransition`؛ سپس `HasEverBeenPublished` با `DeleteNotAllowed`)، `HasEverBeenPublished`، به‌روزرسانی `LastModifiedAt` و `Version` تازه در هر تغییر؛ زمان از بیرون به متدها داده می‌شود در `src/01.Core/Domain/Posts/Post.cs` (وابسته به T029 تا T031)
 - [ ] T033 [P] [US1] تعریف `IPostRepository` (خواندن با شناسه، فهرست نویسنده، فهرست براساس وضعیت، فهرست منتشرشده‌ها، افزودن، حذف و ذخیره با گزارش `ConcurrencyConflictException`) در `src/01.Core/Application/Posts/IPostRepository.cs`
 - [ ] T034 [P] [US1] تعریف مدل‌های `AuthorPostSummary` و `AuthorPostDetail` مطابق contracts/http-api.md در `src/01.Core/Application/Posts/AuthorPostModels.cs`
 - [ ] T035 [US1] پیاده‌سازی `AuthorPostService` برای ایجاد، فهرست، مشاهده، ویرایش (`Draft` و `Returned`) و حذف با نسخهٔ مورد انتظار؛ بررسی نقش نویسنده از `IUserAccessReader` در هر فراخوانی؛ پست دیگران `NotFound`؛ ذخیرهٔ نام نویسنده از جدول کاربران؛ زمان از `TimeProvider` در `src/01.Core/Application/Posts/AuthorPostService.cs`
@@ -135,8 +135,8 @@
 
 ### آزمون‌های User Story 2
 
-- [ ] T041 [P] [US2] آزمون‌های Domain برای `Submit` (از `Draft` و `Returned`، رد محتوای نامعتبر)، `Withdraw`، `Approve` (رد تأیید توسط نویسندهٔ خودش)، `Return` (دلیل الزامی و به‌روزرسانی `LastReturnReason`)، ثبت انجام‌دهنده در سابقه و رد انتقال‌های غیرمجاز در `tests/BlogSpecLab.Tests/Domain/PostReviewTests.cs`
-- [ ] T042 [P] [US2] آزمون‌های پذیرش HTTP برای سناریوهای ۴، ۵، ۶، ۷، ۹، ۱۶، ۲۱، ۲۲، ۲۵ و ۲۸ در quickstart.md، به‌علاوهٔ: ویرایش پست `InReview` (409)، صف `InReview` ویراستار، 404 برای پست `Draft` از مسیر جزئیات ویراستار، 200 بدون عنوان و متن برای همان پست از مسیر سابقه، 404 مسیر سابقه برای پست ناموجود، 403 مسیر سابقه برای کاربر بدون نقش ویراستار، و نمایش آخرین دلیل بازگشت در فهرست نویسنده (SC-006) در `tests/BlogSpecLab.Tests/Api/ReviewWorkflowTests.cs`
+- [ ] T041 [P] [US2] آزمون‌های Domain برای `Submit` (از `Draft` و `Returned`، رد محتوای نامعتبر)، `Withdraw`، `Approve` (رد تأیید توسط نویسندهٔ خودش)، `Return` (دلیل الزامی و به‌روزرسانی `LastReturnReason`)، ثبت انجام‌دهنده در سابقه، رد انتقال‌های غیرمجاز، مجاز بودن حذف پست «بازگشت برای اصلاح» هرگز منتشرنشده و رد حذف پست `InReview` با `InvalidStatusTransition` در `tests/BlogSpecLab.Tests/Domain/PostReviewTests.cs`
+- [ ] T042 [P] [US2] آزمون‌های پذیرش HTTP برای سناریوهای ۴، ۵، ۶، ۷، ۹، ۱۶، ۲۱، ۲۲، ۲۵ و ۲۸ در quickstart.md، به‌علاوهٔ: ویرایش پست `InReview` (409)، صف `InReview` ویراستار، 404 برای پست `Draft` از مسیر جزئیات ویراستار، 200 بدون عنوان و متن برای همان پست از مسیر سابقه، 404 مسیر سابقه برای پست ناموجود، 403 مسیر سابقه برای کاربر بدون نقش ویراستار، نمایش آخرین دلیل بازگشت در فهرست نویسنده (SC-006)، حذف پست `Returned` هرگز منتشرنشده (204) و حذف پست `InReview` (409 با `InvalidStatusTransition`) در `tests/BlogSpecLab.Tests/Api/ReviewWorkflowTests.cs`
 
 ### پیاده‌سازی User Story 2
 
@@ -161,8 +161,8 @@
 
 ### آزمون‌های User Story 3
 
-- [ ] T049 [P] [US3] آزمون‌های Domain برای `Publish` فقط از `Approved` (به‌روزرسانی `LastPublishedAt`)، `Unpublish` به `Approved` (حفظ `LastPublishedAt`)، ویرایش `Approved` و `Published` فقط با تأیید پیامد و بازگشت به `Draft`، و رد حذف پس از اولین انتشار در `tests/BlogSpecLab.Tests/Domain/PostPublicationTests.cs`
-- [ ] T050 [P] [US3] آزمون‌های پذیرش HTTP برای سناریوهای ۸، ۱۰، ۱۲، ۱۳، ۱۴، ۱۵، ۱۷ (هر دو ترتیب پشت‌سرهم انتشار و ویرایش به‌صورت قطعی؛ تعارض هم‌زمان هنگام ذخیره در T062 آزموده می‌شود؛ در ترتیب «اول انتشار»، نبود پست در فهرست `Published` ویراستار و ثبت تغییر «منتشرشده» به «پیش‌نویس» توسط نویسنده در مسیر سابقه نیز بررسی شود)، ۱۸، ۱۹، ۲۴ و ۲۶ در quickstart.md، در `tests/BlogSpecLab.Tests/Api/PublicationTests.cs`
+- [ ] T049 [P] [US3] آزمون‌های Domain برای `Publish` فقط از `Approved` (به‌روزرسانی `LastPublishedAt`)، `Unpublish` به `Approved` (حفظ `LastPublishedAt`)، ویرایش `Approved` و `Published` فقط با تأیید پیامد و بازگشت به `Draft`، رد حذف پست `Approved` و `Published` با `InvalidStatusTransition` (حتی اگر قبلاً منتشر شده باشد) و رد حذف پیش‌نویسِ قبلاً منتشرشده با `DeleteNotAllowed` در `tests/BlogSpecLab.Tests/Domain/PostPublicationTests.cs`
+- [ ] T050 [P] [US3] آزمون‌های پذیرش HTTP برای سناریوهای ۸، ۱۰، ۱۲، ۱۳، ۱۴، ۱۵، ۱۷ (هر دو ترتیب پشت‌سرهم انتشار و ویرایش به‌صورت قطعی؛ تعارض هم‌زمان هنگام ذخیره در T062 آزموده می‌شود؛ در ترتیب «اول انتشار»، نبود پست در فهرست `Published` ویراستار و ثبت تغییر «منتشرشده» به «پیش‌نویس» توسط نویسنده در مسیر سابقه نیز بررسی شود)، ۱۸، ۱۹، ۲۴ و ۲۶ در quickstart.md، به‌علاوهٔ حذف پست `Approved` و `Published` (409 با `InvalidStatusTransition`)، در `tests/BlogSpecLab.Tests/Api/PublicationTests.cs`
 - [ ] T051 [P] [US3] آزمون‌های پذیرش مسیرهای عمومی برای سناریوهای ۱۱ و ۲۷، ترتیب جدیدترین انتشار با `ManualTimeProvider`، پاسخ 404 یکسان برای پست ناموجود و منتشرنشده، دسترسی بدون Token، و 401 برای Token نامعتبر در `tests/BlogSpecLab.Tests/Api/PublicReadTests.cs`
 - [ ] T062 [P] [US3] آزمون‌های Application برای تعارض هم‌زمان هنگام ذخیره، با یک `IPostRepository` جعلی دست‌نویس (بدون بستهٔ جدید) که در اولین ذخیره تغییر کاربر دیگر را شبیه‌سازی می‌کند و `ConcurrencyConflictException` گزارش می‌دهد: ویرایش نویسنده با تأیید پیامد، پس از انتشار هم‌زمان ویراستار، یک بار دوباره خوانده و اجرا می‌شود و پست «پیش‌نویس» می‌شود (FR-012، T053)؛ انتشار ویراستار پس از ویرایش هم‌زمان نویسنده بدون تلاش دوباره نتیجهٔ `StaleVersion` می‌گیرد و هیچ تغییری ذخیره نمی‌شود (FR-014، R-11)؛ اگر Repository جعلی در هر دو ذخیره `ConcurrencyConflictException` گزارش دهد، ویرایش نویسنده دقیقاً یک بار دوباره اجرا می‌شود و سپس نتیجهٔ `StaleVersion` با `currentStatus` و `currentVersion` می‌گیرد و هیچ تغییری ذخیره نمی‌شود (U4)؛ در `tests/BlogSpecLab.Tests/Application/ConcurrencyConflictTests.cs`
 

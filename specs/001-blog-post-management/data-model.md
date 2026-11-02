@@ -169,6 +169,10 @@ Approved/Published  ──Edit──►      Draft
 هر انتقال دیگری با کد `InvalidStatusTransition` رد می‌شود و وضعیت تغییر نمی‌کند. ویراستاری که
 نویسندهٔ پست هم هست، می‌تواند پست خودش را بازگرداند؛ فقط تأیید آن برایش ممنوع است (FR-013).
 
+ترتیب بررسی حذف: ابتدا وضعیت بررسی می‌شود. حذف پست «در انتظار بررسی»، «تأییدشده» یا «منتشرشده» با
+`InvalidStatusTransition` رد می‌شود، حتی اگر پست قبلاً منتشر شده باشد. کد `DeleteNotAllowed` فقط برای
+پست «پیش‌نویس» یا «بازگشت برای اصلاح» است که قبلاً منتشر شده است (FR-003).
+
 ## قواعد اعتبارسنجی
 
 | قاعده | محل اجرا | کد خطا |
@@ -178,7 +182,7 @@ Approved/Published  ──Edit──►      Draft
 | دلیل بازگشت خالی | Domain | `ReturnReasonRequired` |
 | انتقال غیرمجاز | Domain | `InvalidStatusTransition` |
 | تأیید پست توسط نویسندهٔ خودش | Domain | `SelfApprovalNotAllowed` |
-| حذف پستی که قبلاً منتشر شده است | Domain | `DeleteNotAllowed` |
+| حذف پست «پیش‌نویس» یا «بازگشت برای اصلاح» که قبلاً منتشر شده است | Domain | `DeleteNotAllowed` |
 | ویرایش پست تأییدشده یا منتشرشده بدون تأیید نویسنده | Application | `ConfirmationRequired` |
 | سرآیند `If-Match` در فرمان تغییر وضعیت ارسال نشده | Api | `PreconditionRequired` |
 | قالب سرآیند `If-Match` نامعتبر | Api | `InvalidIfMatch` |
