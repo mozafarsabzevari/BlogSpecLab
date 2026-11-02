@@ -16,6 +16,8 @@ public static class AuthorEndpoints
         group.MapGet("/{id:guid}", GetAsync);
         group.MapPut("/{id:guid}", EditAsync);
         group.MapDelete("/{id:guid}", DeleteAsync);
+        group.MapPost("/{id:guid}/submit", SubmitAsync);
+        group.MapPost("/{id:guid}/withdraw", WithdrawAsync);
 
         return routes;
     }
@@ -81,6 +83,36 @@ public static class AuthorEndpoints
         var result = await service.DeleteAsync(id, expectedVersion, cancellationToken);
 
         return result.IsSuccess ? Results.NoContent() : result.Error.ToProblem();
+    }
+
+    private static async Task<IResult> SubmitAsync(
+        Guid id,
+        HttpRequest request,
+        AuthorPostService service,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (!ETagHeaders.TryReadIfMatch(request, out var expectedVersion, out var problem))
+        {
+            return problem;
+        }
+
+        return PostResult(await service.SubmitAsync(id, expectedVersion, cancellationToken), response);
+    }
+
+    private static async Task<IResult> WithdrawAsync(
+        Guid id,
+        HttpRequest request,
+        AuthorPostService service,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (!ETagHeaders.TryReadIfMatch(request, out var expectedVersion, out var problem))
+        {
+            return problem;
+        }
+
+        return PostResult(await service.WithdrawAsync(id, expectedVersion, cancellationToken), response);
     }
 
     private static IResult PostResult(Result<AuthorPostDetail> result, HttpResponse response)

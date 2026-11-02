@@ -28,6 +28,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddScoped<AuthorPostService>();
+builder.Services.AddScoped<EditorPostService>();
 
 var app = builder.Build();
 
@@ -56,6 +57,7 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 
 app.MapAuthorEndpoints();
+app.MapEditorEndpoints();
 
 app.Run();
 return 0;

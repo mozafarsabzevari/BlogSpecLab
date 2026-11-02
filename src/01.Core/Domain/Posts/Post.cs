@@ -85,6 +85,52 @@ public sealed class Post
         Touch(now);
     }
 
+    public void Submit(Guid actorId, string actorDisplayName, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.Draft, PostStatus.Returned);
+        ValidateContent(Title, Body);
+
+        ChangeStatus(PostStatus.InReview, actorId, actorDisplayName, reason: null, now);
+    }
+
+    public void Withdraw(Guid actorId, string actorDisplayName, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.InReview);
+
+        ChangeStatus(PostStatus.Draft, actorId, actorDisplayName, reason: null, now);
+    }
+
+    public void Approve(Guid editorId, string editorDisplayName, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.InReview);
+
+        if (editorId == AuthorId)
+        {
+            throw new PostDomainException(
+                PostErrorCode.SelfApprovalNotAllowed,
+                "نویسندهٔ پست نمی‌تواند پست خودش را تأیید کند.");
+        }
+
+        ChangeStatus(PostStatus.Approved, editorId, editorDisplayName, reason: null, now);
+    }
+
+    public void Return(Guid editorId, string editorDisplayName, string? reason, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.InReview);
+
+        var trimmedReason = reason?.Trim();
+
+        if (string.IsNullOrEmpty(trimmedReason))
+        {
+            throw new PostDomainException(
+                PostErrorCode.ReturnReasonRequired,
+                "دلیل بازگرداندن الزامی است.");
+        }
+
+        ChangeStatus(PostStatus.Returned, editorId, editorDisplayName, trimmedReason, now);
+        LastReturnReason = trimmedReason;
+    }
+
     public void EnsureCanDelete()
     {
         if (Status is not (PostStatus.Draft or PostStatus.Returned))
@@ -100,6 +146,30 @@ public sealed class Post
                 PostErrorCode.DeleteNotAllowed,
                 "پستی که حداقل یک بار منتشر شده است قابل حذف نیست.");
         }
+    }
+
+    private void EnsureStatus(params PostStatus[] allowed)
+    {
+        if (!allowed.Contains(Status))
+        {
+            throw new PostDomainException(
+                PostErrorCode.InvalidStatusTransition,
+                "این عملیات در وضعیت فعلی پست مجاز نیست.");
+        }
+    }
+
+    private void ChangeStatus(
+        PostStatus toStatus,
+        Guid actorId,
+        string actorDisplayName,
+        string? reason,
+        DateTimeOffset now)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorDisplayName);
+
+        _statusChanges.Add(new StatusChange(Id, actorId, actorDisplayName, now, Status, toStatus, reason));
+        Status = toStatus;
+        Touch(now);
     }
 
     private void Touch(DateTimeOffset now)

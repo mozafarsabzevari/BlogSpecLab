@@ -62,6 +62,13 @@ public static class ProblemDetailsMapping
             "سرآیند If-Match باید دقیقاً یک نسخه به شکل شناسهٔ داخل گیومه باشد.",
             "InvalidIfMatch");
 
+    public static IResult InvalidStatus() =>
+        Problem(
+            StatusCodes.Status400BadRequest,
+            "درخواست نامعتبر است.",
+            "پارامتر status باید یکی از مقدارهای InReview، Approved یا Published باشد.",
+            "InvalidStatus");
+
     private static IResult Problem(
         int status,
         string title,

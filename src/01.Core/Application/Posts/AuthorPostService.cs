@@ -58,7 +58,7 @@ public sealed class AuthorPostService(
 
     public async Task<Result<AuthorPostDetail>> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var (post, error) = await GetOwnPostAsync(id, cancellationToken);
+        var (post, _, error) = await GetOwnPostAsync(id, cancellationToken);
 
         return error is null
             ? Result.Success(ToDetail(post!))
@@ -71,7 +71,7 @@ public sealed class AuthorPostService(
         string? body,
         CancellationToken cancellationToken = default)
     {
-        var (post, error) = await GetOwnPostAsync(id, cancellationToken);
+        var (post, _, error) = await GetOwnPostAsync(id, cancellationToken);
 
         if (error is not null)
         {
@@ -99,9 +99,29 @@ public sealed class AuthorPostService(
         return Result.Success(ToDetail(post));
     }
 
+    public Task<Result<AuthorPostDetail>> SubmitAsync(
+        Guid id,
+        Guid expectedVersion,
+        CancellationToken cancellationToken = default) =>
+        ChangeStatusAsync(
+            id,
+            expectedVersion,
+            (post, author, now) => post.Submit(author.UserId, author.DisplayName, now),
+            cancellationToken);
+
+    public Task<Result<AuthorPostDetail>> WithdrawAsync(
+        Guid id,
+        Guid expectedVersion,
+        CancellationToken cancellationToken = default) =>
+        ChangeStatusAsync(
+            id,
+            expectedVersion,
+            (post, author, now) => post.Withdraw(author.UserId, author.DisplayName, now),
+            cancellationToken);
+
     public async Task<Result> DeleteAsync(Guid id, Guid expectedVersion, CancellationToken cancellationToken = default)
     {
-        var (post, error) = await GetOwnPostAsync(id, cancellationToken);
+        var (post, _, error) = await GetOwnPostAsync(id, cancellationToken);
 
         if (error is not null)
         {
@@ -150,20 +170,61 @@ public sealed class AuthorPostService(
             : (null, new Error(ErrorCode.Forbidden, "این عملیات فقط برای نویسندگان مجاز است."));
     }
 
-    private async Task<(Post? Post, Error? Error)> GetOwnPostAsync(Guid id, CancellationToken cancellationToken)
+    private async Task<Result<AuthorPostDetail>> ChangeStatusAsync(
+        Guid id,
+        Guid expectedVersion,
+        Action<Post, UserAccess, DateTimeOffset> change,
+        CancellationToken cancellationToken)
+    {
+        var (post, author, error) = await GetOwnPostAsync(id, cancellationToken);
+
+        if (error is not null)
+        {
+            return Result.Failure<AuthorPostDetail>(error);
+        }
+
+        if (post!.Version != expectedVersion)
+        {
+            return Result.Failure<AuthorPostDetail>(StaleVersion(post));
+        }
+
+        try
+        {
+            change(post, author!, timeProvider.GetUtcNow());
+        }
+        catch (PostDomainException exception)
+        {
+            return Result.Failure<AuthorPostDetail>(ToError(exception, post));
+        }
+
+        try
+        {
+            await posts.SaveChangesAsync(cancellationToken);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            return Result.Failure<AuthorPostDetail>(await ConflictErrorAsync(id, cancellationToken));
+        }
+
+        return Result.Success(ToDetail(post));
+    }
+
+    private async Task<(Post? Post, UserAccess? Author, Error? Error)> GetOwnPostAsync(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var (author, accessError) = await GetAuthorAsync(cancellationToken);
 
         if (accessError is not null)
         {
-            return (null, accessError);
+            return (null, null, accessError);
         }
 
         var post = await posts.GetByIdAsync(id, cancellationToken);
 
         return post is not null && post.AuthorId == author!.UserId
-            ? (post, null)
-            : (null, NotFound());
+            ? (post, author, null)
+            : (null, null, NotFound());
     }
 
     private async Task<Error> ConflictErrorAsync(Guid id, CancellationToken cancellationToken)
@@ -173,30 +234,12 @@ public sealed class AuthorPostService(
         return current is null ? NotFound() : StaleVersion(current);
     }
 
-    private static Error NotFound() => new(ErrorCode.NotFound, "پست پیدا نشد.");
+    private static Error NotFound() => PostErrors.NotFound();
 
-    private static Error StaleVersion(Post post) =>
-        new(
-            ErrorCode.StaleVersion,
-            "پست پس از آخرین مشاهدهٔ شما تغییر کرده است. آن را دوباره بخوانید.",
-            post.Status.ToString(),
-            post.Version);
+    private static Error StaleVersion(Post post) => PostErrors.StaleVersion(post);
 
-    private static Error ToError(PostDomainException exception, Post? post = null)
-    {
-        var code = exception.Code switch
-        {
-            PostErrorCode.InvalidTitle => ErrorCode.InvalidTitle,
-            PostErrorCode.InvalidBody => ErrorCode.InvalidBody,
-            PostErrorCode.ReturnReasonRequired => ErrorCode.ReturnReasonRequired,
-            PostErrorCode.InvalidStatusTransition => ErrorCode.InvalidStatusTransition,
-            PostErrorCode.SelfApprovalNotAllowed => ErrorCode.SelfApprovalNotAllowed,
-            PostErrorCode.DeleteNotAllowed => ErrorCode.DeleteNotAllowed,
-            _ => throw new ArgumentOutOfRangeException(nameof(exception), exception.Code, "Unmapped domain error.")
-        };
-
-        return new Error(code, exception.Message, post?.Status.ToString(), post?.Version);
-    }
+    private static Error ToError(PostDomainException exception, Post? post = null) =>
+        PostErrors.FromDomain(exception, post);
 
     private static AuthorPostSummary ToSummary(Post post) =>
         new(

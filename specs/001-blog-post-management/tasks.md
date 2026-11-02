@@ -135,17 +135,17 @@
 
 ### آزمون‌های User Story 2
 
-- [ ] T041 [P] [US2] آزمون‌های Domain برای `Submit` (از `Draft` و `Returned`، رد محتوای نامعتبر)، `Withdraw`، `Approve` (رد تأیید توسط نویسندهٔ خودش)، `Return` (دلیل الزامی و به‌روزرسانی `LastReturnReason`)، ثبت انجام‌دهنده در سابقه، رد انتقال‌های غیرمجاز، ویرایش در `Returned` با `Version` تازه و بدون تغییر وضعیت، رد ویرایش در `InReview` با `InvalidStatusTransition`، مجاز بودن حذف پست «بازگشت برای اصلاح» هرگز منتشرنشده و رد حذف پست `InReview` با `InvalidStatusTransition` در `tests/BlogSpecLab.Tests/Domain/PostReviewTests.cs`
-- [ ] T042 [P] [US2] آزمون‌های پذیرش HTTP برای سناریوهای ۴، ۵، ۶، ۷، ۹، ۱۶، ۲۱، ۲۲، ۲۵ و ۲۸ در quickstart.md، به‌علاوهٔ: ویرایش پست `InReview` (409)، صف `InReview` ویراستار، 404 برای پست `Draft` از مسیر جزئیات ویراستار، 200 بدون عنوان و متن برای همان پست از مسیر سابقه، 404 مسیر سابقه برای پست ناموجود، 403 مسیر سابقه برای کاربر بدون نقش ویراستار، نمایش آخرین دلیل بازگشت در فهرست نویسنده (SC-006)، حذف پست `Returned` هرگز منتشرنشده (204) و حذف پست `InReview` (409 با `InvalidStatusTransition`) در `tests/BlogSpecLab.Tests/Api/ReviewWorkflowTests.cs`
+- [X] T041 [P] [US2] آزمون‌های Domain برای `Submit` (از `Draft` و `Returned`، رد محتوای نامعتبر)، `Withdraw`، `Approve` (رد تأیید توسط نویسندهٔ خودش)، `Return` (دلیل الزامی و به‌روزرسانی `LastReturnReason`)، ثبت انجام‌دهنده در سابقه، رد انتقال‌های غیرمجاز، ویرایش در `Returned` با `Version` تازه و بدون تغییر وضعیت، رد ویرایش در `InReview` با `InvalidStatusTransition`، مجاز بودن حذف پست «بازگشت برای اصلاح» هرگز منتشرنشده و رد حذف پست `InReview` با `InvalidStatusTransition` در `tests/BlogSpecLab.Tests/Domain/PostReviewTests.cs`
+- [X] T042 [P] [US2] آزمون‌های پذیرش HTTP برای سناریوهای ۴، ۵، ۶، ۷، ۹، ۱۶، ۲۱، ۲۲، ۲۵ و ۲۸ در quickstart.md، به‌علاوهٔ: ویرایش پست `InReview` (409)، صف `InReview` ویراستار، 404 برای پست `Draft` از مسیر جزئیات ویراستار، 200 بدون عنوان و متن برای همان پست از مسیر سابقه، 404 مسیر سابقه برای پست ناموجود، 403 مسیر سابقه برای کاربر بدون نقش ویراستار، نمایش آخرین دلیل بازگشت در فهرست نویسنده (SC-006)، حذف پست `Returned` هرگز منتشرنشده (204) و حذف پست `InReview` (409 با `InvalidStatusTransition`) در `tests/BlogSpecLab.Tests/Api/ReviewWorkflowTests.cs`
 
 ### پیاده‌سازی User Story 2
 
-- [ ] T043 [US2] افزودن متدهای `Submit`، `Withdraw`، `Approve` و `Return` به `src/01.Core/Domain/Posts/Post.cs`
-- [ ] T044 [US2] افزودن ارسال و پس گرفتن با نسخهٔ مورد انتظار به `src/01.Core/Application/Posts/AuthorPostService.cs`
-- [ ] T045 [P] [US2] تعریف مدل‌های `EditorPostSummary`، `EditorPostDetail` همراه با `history` و `EditorPostHistory` (فقط `id`، `status` و `history`) در `src/01.Core/Application/Posts/EditorPostModels.cs`
-- [ ] T046 [US2] پیاده‌سازی `EditorPostService` برای فهرست براساس وضعیت (فقط `InReview`، `Approved` و `Published`)، مشاهده با سابقه (`Draft` و `Returned` برابر `NotFound`)، مشاهدهٔ فقط سابقه برای پست در هر وضعیت بدون عنوان و متن (FR-011)، تأیید و بازگرداندن؛ بررسی نقش ویراستار از `IUserAccessReader` در هر فراخوانی؛ نتیجهٔ `StaleVersion` با وضعیت و نسخهٔ فعلی در `src/01.Core/Application/Posts/EditorPostService.cs`
-- [ ] T047 [US2] افزودن مسیرهای `POST {id}/submit` و `POST {id}/withdraw` با `If-Match` به `src/03.Endpoints/Api/Posts/AuthorEndpoints.cs`
-- [ ] T048 [US2] پیاده‌سازی مسیرهای `GET ?status=`، `GET {id}`، `GET {id}/history`، `POST {id}/approve` و `POST {id}/return` زیر `/api/editor/posts` و ثبت آن‌ها در `Program.cs`، در فایل `src/03.Endpoints/Api/Posts/EditorEndpoints.cs`
+- [X] T043 [US2] افزودن متدهای `Submit`، `Withdraw`، `Approve` و `Return` به `src/01.Core/Domain/Posts/Post.cs`
+- [X] T044 [US2] افزودن ارسال و پس گرفتن با نسخهٔ مورد انتظار به `src/01.Core/Application/Posts/AuthorPostService.cs`
+- [X] T045 [P] [US2] تعریف مدل‌های `EditorPostSummary`، `EditorPostDetail` همراه با `history` و `EditorPostHistory` (فقط `id`، `status` و `history`) در `src/01.Core/Application/Posts/EditorPostModels.cs`
+- [X] T046 [US2] پیاده‌سازی `EditorPostService` برای فهرست براساس وضعیت (فقط `InReview`، `Approved` و `Published`)، مشاهده با سابقه (`Draft` و `Returned` برابر `NotFound`)، مشاهدهٔ فقط سابقه برای پست در هر وضعیت بدون عنوان و متن (FR-011)، تأیید و بازگرداندن؛ بررسی نقش ویراستار از `IUserAccessReader` در هر فراخوانی؛ نتیجهٔ `StaleVersion` با وضعیت و نسخهٔ فعلی در `src/01.Core/Application/Posts/EditorPostService.cs`
+- [X] T047 [US2] افزودن مسیرهای `POST {id}/submit` و `POST {id}/withdraw` با `If-Match` به `src/03.Endpoints/Api/Posts/AuthorEndpoints.cs`
+- [X] T048 [US2] پیاده‌سازی مسیرهای `GET ?status=`، `GET {id}`، `GET {id}/history`، `POST {id}/approve` و `POST {id}/return` زیر `/api/editor/posts` و ثبت آن‌ها در `Program.cs`، در فایل `src/03.Endpoints/Api/Posts/EditorEndpoints.cs`
 
 **نقطهٔ بررسی:** User Stories 1 و 2 هر دو مستقل کار می‌کنند.
 
