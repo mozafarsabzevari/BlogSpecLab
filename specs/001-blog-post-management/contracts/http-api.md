@@ -128,7 +128,7 @@ If-Match: "6f1c2b0e-3d4a-4f7e-9a51-2c8d0b7e4a11"
 | ایجاد پست | `POST /api/author/posts` | `title`، `body` | 201 و `AuthorPostDetail` | 400 | FR-002 |
 | فهرست پست‌های خود | `GET /api/author/posts` | — | 200 و فهرست `AuthorPostSummary`، جدیدترین تغییر اول | — | FR-005، SC-006 |
 | مشاهدهٔ یک پست | `GET /api/author/posts/{id}` | — | 200 و `AuthorPostDetail` | 404 | FR-004 |
-| ویرایش | `PUT /api/author/posts/{id}` | `title`، `body`، `confirmRevertToDraft` (اختیاری) | 200 و `AuthorPostDetail` | 400؛ 404؛ 409 با `InvalidStatusTransition` برای پست در انتظار بررسی؛ 409 با `ConfirmationRequired` | FR-003، FR-012 |
+| ویرایش | `PUT /api/author/posts/{id}` | `title`، `body`، `confirmRevertToDraft` (اختیاری) | 200 و `AuthorPostDetail` | 400؛ 404؛ 409 با `InvalidStatusTransition` برای پست در انتظار بررسی؛ 409 با `ConfirmationRequired`؛ 412 با `StaleVersion` فقط وقتی تلاش دوبارهٔ ذخیره هم با تغییر هم‌زمان روبه‌رو شود (R-11) | FR-003، FR-012 |
 | حذف | `DELETE /api/author/posts/{id}` + `If-Match` | — | 204 | 404؛ 409 با `InvalidStatusTransition` یا `DeleteNotAllowed`؛ 412؛ 428 | FR-003 |
 | ارسال برای بررسی | `POST /api/author/posts/{id}/submit` + `If-Match` | — | 200 و `AuthorPostDetail` | 400، 404، 409، 412، 428 | FR-006 |
 | پس گرفتن ارسال | `POST /api/author/posts/{id}/withdraw` + `If-Match` | — | 200 و `AuthorPostDetail` | 404، 409، 412، 428 | FR-006 |
