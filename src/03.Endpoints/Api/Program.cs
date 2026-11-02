@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
 using BlogSpecLab.Core.Application.Common;
+using BlogSpecLab.Core.Application.Posts;
 using BlogSpecLab.Endpoints.Api.Authentication;
+using BlogSpecLab.Endpoints.Api.Posts;
 using BlogSpecLab.Endpoints.Api.Provisioning;
 using BlogSpecLab.Infra.DataAccess;
 using Microsoft.AspNetCore.Authentication;
@@ -21,6 +24,10 @@ builder.Services
         OpaqueTokenAuthenticationHandler.SchemeName, configureOptions: null);
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddScoped<AuthorPostService>();
 
 var app = builder.Build();
 
@@ -47,6 +54,8 @@ app.Use(async (context, next) =>
 });
 
 app.UseAuthorization();
+
+app.MapAuthorEndpoints();
 
 app.Run();
 return 0;

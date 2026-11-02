@@ -41,17 +41,44 @@ public static class ProblemDetailsMapping
             }
         }
 
-        return Results.Problem(
-            detail: error.Message,
-            statusCode: status,
-            title: title,
-            type: TypeBaseUri + ToKebabCase(error.Code.ToString()),
-            extensions: extensions);
+        return Problem(status, title, error.Message, error.Code.ToString(), extensions);
     }
 
     public static IResult Unauthenticated() =>
         new Error(ErrorCode.Unauthenticated, "Token ارسال نشده، نامعتبر یا منقضی است، یا کاربر غیرفعال است.")
             .ToProblem();
+
+    public static IResult PreconditionRequired() =>
+        Problem(
+            StatusCodes.Status428PreconditionRequired,
+            "سرآیند If-Match الزامی است.",
+            "نسخهٔ دیده‌شدهٔ پست را در سرآیند If-Match بفرستید.",
+            "PreconditionRequired");
+
+    public static IResult InvalidIfMatch() =>
+        Problem(
+            StatusCodes.Status400BadRequest,
+            "درخواست نامعتبر است.",
+            "سرآیند If-Match باید دقیقاً یک نسخه به شکل شناسهٔ داخل گیومه باشد.",
+            "InvalidIfMatch");
+
+    private static IResult Problem(
+        int status,
+        string title,
+        string detail,
+        string code,
+        Dictionary<string, object?>? extensions = null)
+    {
+        extensions ??= [];
+        extensions["code"] = code;
+
+        return Results.Problem(
+            detail: detail,
+            statusCode: status,
+            title: title,
+            type: TypeBaseUri + ToKebabCase(code),
+            extensions: extensions);
+    }
 
     private static string ToKebabCase(string value)
     {

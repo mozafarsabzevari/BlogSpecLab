@@ -17,6 +17,95 @@ namespace BlogSpecLab.Infra.DataAccess.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AuthorDisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(50000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("LastModifiedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("LastPublishedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastReturnReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("Status", "LastPublishedAt");
+
+                    b.ToTable("Posts", (string)null);
+                });
+
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.StatusChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ActorDisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FromStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("OccurredAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ToStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostStatusChanges", (string)null);
+                });
+
             modelBuilder.Entity("BlogSpecLab.Infra.DataAccess.Identity.AccessTokenRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -82,6 +171,15 @@ namespace BlogSpecLab.Infra.DataAccess.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.StatusChange", b =>
+                {
+                    b.HasOne("BlogSpecLab.Core.Domain.Posts.Post", null)
+                        .WithMany("StatusChanges")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("BlogSpecLab.Infra.DataAccess.Identity.AccessTokenRecord", b =>
                 {
                     b.HasOne("BlogSpecLab.Infra.DataAccess.Identity.UserRecord", "User")
@@ -100,6 +198,11 @@ namespace BlogSpecLab.Infra.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.Post", b =>
+                {
+                    b.Navigation("StatusChanges");
                 });
 
             modelBuilder.Entity("BlogSpecLab.Infra.DataAccess.Identity.UserRecord", b =>

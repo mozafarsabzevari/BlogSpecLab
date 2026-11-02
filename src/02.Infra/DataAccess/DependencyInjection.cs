@@ -1,5 +1,7 @@
 using BlogSpecLab.Core.Application.Common;
+using BlogSpecLab.Core.Application.Posts;
 using BlogSpecLab.Infra.DataAccess.Identity;
+using BlogSpecLab.Infra.DataAccess.Posts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +17,7 @@ public static class DependencyInjection
         services.AddScoped<IUserAccessReader, UserAccessReader>();
         services.AddScoped<IAccessTokenReader, AccessTokenReader>();
         services.AddScoped<LocalProvisioner>();
+        services.AddScoped<IPostRepository, PostRepository>();
 
         return services;
     }
