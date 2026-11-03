@@ -14,6 +14,14 @@ internal static class PostErrors
             post.Status.ToString(),
             post.Version);
 
+    public static Error ConfirmationRequired(Post post) =>
+        new(
+            ErrorCode.ConfirmationRequired,
+            "ویرایش پست تأییدشده یا منتشرشده آن را به پیش‌نویس برمی‌گرداند و از دید خوانندگان خارج می‌کند. "
+                + "برای ادامه، confirmRevertToDraft را برابر true بفرستید.",
+            post.Status.ToString(),
+            post.Version);
+
     public static Error FromDomain(PostDomainException exception, Post? post = null)
     {
         var code = exception.Code switch

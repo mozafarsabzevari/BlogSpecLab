@@ -29,6 +29,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.Services.AddScoped<AuthorPostService>();
 builder.Services.AddScoped<EditorPostService>();
+builder.Services.AddScoped<PublicPostQueries>();
 
 var app = builder.Build();
 
@@ -58,6 +59,7 @@ app.UseAuthorization();
 
 app.MapAuthorEndpoints();
 app.MapEditorEndpoints();
+app.MapPublicEndpoints();
 
 app.Run();
 return 0;

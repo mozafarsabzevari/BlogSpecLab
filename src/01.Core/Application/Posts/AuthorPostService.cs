@@ -65,38 +65,49 @@ public sealed class AuthorPostService(
             : Result.Failure<AuthorPostDetail>(error);
     }
 
+    /// <summary>
+    /// Edits do not depend on a seen version (FR-012). On a concurrent change the post is read again and the
+    /// edit is applied once more to its current state; a second conflict is reported as stale (R-11).
+    /// </summary>
     public async Task<Result<AuthorPostDetail>> EditAsync(
         Guid id,
         string? title,
         string? body,
+        bool confirmRevertToDraft = false,
         CancellationToken cancellationToken = default)
     {
-        var (post, _, error) = await GetOwnPostAsync(id, cancellationToken);
+        const int maxAttempts = 2;
 
-        if (error is not null)
+        for (var attempt = 1; ; attempt++)
         {
-            return Result.Failure<AuthorPostDetail>(error);
-        }
+            var (post, author, error) = await GetOwnPostAsync(id, cancellationToken);
 
-        try
-        {
-            post!.Edit(title, body, timeProvider.GetUtcNow());
-        }
-        catch (PostDomainException exception)
-        {
-            return Result.Failure<AuthorPostDetail>(ToError(exception, post));
-        }
+            if (error is not null)
+            {
+                return Result.Failure<AuthorPostDetail>(error);
+            }
 
-        try
-        {
-            await posts.SaveChangesAsync(cancellationToken);
-        }
-        catch (ConcurrencyConflictException)
-        {
-            return Result.Failure<AuthorPostDetail>(await ConflictErrorAsync(id, cancellationToken));
-        }
+            var editError = ApplyEdit(post!, author!, title, body, confirmRevertToDraft);
 
-        return Result.Success(ToDetail(post));
+            if (editError is not null)
+            {
+                return Result.Failure<AuthorPostDetail>(editError);
+            }
+
+            try
+            {
+                await posts.SaveChangesAsync(cancellationToken);
+                return Result.Success(ToDetail(post!));
+            }
+            catch (ConcurrencyConflictException) when (attempt == maxAttempts)
+            {
+                return Result.Failure<AuthorPostDetail>(await ConflictErrorAsync(id, cancellationToken));
+            }
+            catch (ConcurrencyConflictException)
+            {
+                // Read the post again and re-apply the edit to its current state.
+            }
+        }
     }
 
     public Task<Result<AuthorPostDetail>> SubmitAsync(
@@ -225,6 +236,33 @@ public sealed class AuthorPostService(
         return post is not null && post.AuthorId == author!.UserId
             ? (post, author, null)
             : (null, null, NotFound());
+    }
+
+    private Error? ApplyEdit(Post post, UserAccess author, string? title, string? body, bool confirmRevertToDraft)
+    {
+        var now = timeProvider.GetUtcNow();
+
+        try
+        {
+            if (post.Status is not (PostStatus.Approved or PostStatus.Published))
+            {
+                post.Edit(title, body, now);
+            }
+            else if (confirmRevertToDraft)
+            {
+                post.EditAndRevertToDraft(author.UserId, author.DisplayName, title, body, now);
+            }
+            else
+            {
+                return PostErrors.ConfirmationRequired(post);
+            }
+        }
+        catch (PostDomainException exception)
+        {
+            return ToError(exception, post);
+        }
+
+        return null;
     }
 
     private async Task<Error> ConflictErrorAsync(Guid id, CancellationToken cancellationToken)

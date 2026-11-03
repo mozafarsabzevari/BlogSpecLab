@@ -66,7 +66,7 @@ public sealed class EditorPostService(
         Guid id,
         Guid expectedVersion,
         CancellationToken cancellationToken = default) =>
-        DecideAsync(
+        ChangeStatusAsync(
             id,
             expectedVersion,
             (post, editor, now) => post.Approve(editor.UserId, editor.DisplayName, now),
@@ -77,16 +77,37 @@ public sealed class EditorPostService(
         Guid expectedVersion,
         string? reason,
         CancellationToken cancellationToken = default) =>
-        DecideAsync(
+        ChangeStatusAsync(
             id,
             expectedVersion,
             (post, editor, now) => post.Return(editor.UserId, editor.DisplayName, reason, now),
             cancellationToken);
 
-    private async Task<Result<EditorPostDetail>> DecideAsync(
+    public Task<Result<EditorPostDetail>> PublishAsync(
         Guid id,
         Guid expectedVersion,
-        Action<Post, UserAccess, DateTimeOffset> decide,
+        CancellationToken cancellationToken = default) =>
+        ChangeStatusAsync(
+            id,
+            expectedVersion,
+            (post, editor, now) => post.Publish(editor.UserId, editor.DisplayName, now),
+            cancellationToken);
+
+    public Task<Result<EditorPostDetail>> UnpublishAsync(
+        Guid id,
+        Guid expectedVersion,
+        CancellationToken cancellationToken = default) =>
+        ChangeStatusAsync(
+            id,
+            expectedVersion,
+            (post, editor, now) => post.Unpublish(editor.UserId, editor.DisplayName, now),
+            cancellationToken);
+
+    /// <summary>Stale versions and concurrent changes are reported without retrying (FR-014, R-11).</summary>
+    private async Task<Result<EditorPostDetail>> ChangeStatusAsync(
+        Guid id,
+        Guid expectedVersion,
+        Action<Post, UserAccess, DateTimeOffset> change,
         CancellationToken cancellationToken)
     {
         var (post, editor, error) = await GetVisiblePostAsync(id, cancellationToken);
@@ -103,7 +124,7 @@ public sealed class EditorPostService(
 
         try
         {
-            decide(post, editor!, timeProvider.GetUtcNow());
+            change(post, editor!, timeProvider.GetUtcNow());
         }
         catch (PostDomainException exception)
         {

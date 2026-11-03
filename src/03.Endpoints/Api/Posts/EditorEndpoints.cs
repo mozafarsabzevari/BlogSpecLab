@@ -17,6 +17,8 @@ public static class EditorEndpoints
         group.MapGet("/{id:guid}/history", GetHistoryAsync);
         group.MapPost("/{id:guid}/approve", ApproveAsync);
         group.MapPost("/{id:guid}/return", ReturnAsync);
+        group.MapPost("/{id:guid}/publish", PublishAsync);
+        group.MapPost("/{id:guid}/unpublish", UnpublishAsync);
 
         return routes;
     }
@@ -86,6 +88,36 @@ public static class EditorEndpoints
         return PostResult(
             await service.ReturnAsync(id, expectedVersion, body?.Reason, cancellationToken),
             response);
+    }
+
+    private static async Task<IResult> PublishAsync(
+        Guid id,
+        HttpRequest request,
+        EditorPostService service,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (!ETagHeaders.TryReadIfMatch(request, out var expectedVersion, out var problem))
+        {
+            return problem;
+        }
+
+        return PostResult(await service.PublishAsync(id, expectedVersion, cancellationToken), response);
+    }
+
+    private static async Task<IResult> UnpublishAsync(
+        Guid id,
+        HttpRequest request,
+        EditorPostService service,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (!ETagHeaders.TryReadIfMatch(request, out var expectedVersion, out var problem))
+        {
+            return problem;
+        }
+
+        return PostResult(await service.UnpublishAsync(id, expectedVersion, cancellationToken), response);
     }
 
     private static bool TryParseVisibleStatus(string? value, out PostStatus status)

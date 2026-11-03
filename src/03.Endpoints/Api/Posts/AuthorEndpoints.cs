@@ -64,7 +64,12 @@ public static class AuthorEndpoints
         HttpResponse response,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditAsync(id, request.Title, request.Body, cancellationToken);
+        var result = await service.EditAsync(
+            id,
+            request.Title,
+            request.Body,
+            request.ConfirmRevertToDraft == true,
+            cancellationToken);
 
         return PostResult(result, response);
     }
@@ -126,5 +131,6 @@ public static class AuthorEndpoints
         return Results.Ok(result.Value);
     }
 
-    public sealed record PostContentRequest(string? Title, string? Body);
+    /// <summary><paramref name="ConfirmRevertToDraft"/> is only read by edits (R-12).</summary>
+    public sealed record PostContentRequest(string? Title, string? Body, bool? ConfirmRevertToDraft = null);
 }

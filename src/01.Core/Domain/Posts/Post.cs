@@ -131,6 +131,40 @@ public sealed class Post
         LastReturnReason = trimmedReason;
     }
 
+    public void Publish(Guid editorId, string editorDisplayName, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.Approved);
+
+        ChangeStatus(PostStatus.Published, editorId, editorDisplayName, reason: null, now);
+        LastPublishedAt = now;
+    }
+
+    public void Unpublish(Guid editorId, string editorDisplayName, DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.Published);
+
+        ChangeStatus(PostStatus.Approved, editorId, editorDisplayName, reason: null, now);
+    }
+
+    /// <summary>
+    /// Edits an Approved or Published post. Calling this is the author's confirmation that the post goes back
+    /// to Draft (FR-012).
+    /// </summary>
+    public void EditAndRevertToDraft(
+        Guid authorId,
+        string authorDisplayName,
+        string? title,
+        string? body,
+        DateTimeOffset now)
+    {
+        EnsureStatus(PostStatus.Approved, PostStatus.Published);
+        var (validTitle, validBody) = ValidateContent(title, body);
+
+        Title = validTitle;
+        Body = validBody;
+        ChangeStatus(PostStatus.Draft, authorId, authorDisplayName, reason: null, now);
+    }
+
     public void EnsureCanDelete()
     {
         if (Status is not (PostStatus.Draft or PostStatus.Returned))
