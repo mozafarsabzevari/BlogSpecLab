@@ -182,10 +182,10 @@
 
 ## فاز ۶: Polish و بررسی‌های نهایی
 
-- [ ] T058 بررسی Project Referenceها و بسته‌های همهٔ فایل‌های `.csproj` در برابر اصل II در Constitution و نبود هیچ وابستگی AI، MCP، RAG یا Qdrant
-- [ ] T059 [P] بررسی اینکه هیچ Token، Secret یا Connection String حساسی در کد، Log یا Repository ثبت نشده است، به‌ویژه در `src/03.Endpoints/Api/Provisioning/ProvisioningCommands.cs` و `src/03.Endpoints/Api/Authentication/OpaqueTokenAuthenticationHandler.cs`
+- [X] T058 بررسی Project Referenceها و بسته‌های همهٔ فایل‌های `.csproj` در برابر اصل II در Constitution و نبود هیچ وابستگی AI، MCP، RAG یا Qdrant
+- [X] T059 [P] بررسی اینکه هیچ Token، Secret یا Connection String حساسی در کد، Log یا Repository ثبت نشده است، به‌ویژه در `src/03.Endpoints/Api/Provisioning/ProvisioningCommands.cs` و `src/03.Endpoints/Api/Authentication/OpaqueTokenAuthenticationHandler.cs`
 - [ ] T060 اجرای کامل [quickstart.md](./quickstart.md): Build، Test، `dotnet ef database update`، ساخت چهار کاربر نمونه با `provision-user` و اجرای دستی سناریوهای ۱، ۴ و ۵ برای سنجش SC-004 و SC-005
-- [ ] T061 [P] اصلاح `specs/001-blog-post-management/quickstart.md` در صورتی که دستورها یا خروجی‌های واقعی با متن آن تفاوت داشته باشند
+- [X] T061 [P] اصلاح `specs/001-blog-post-management/quickstart.md` در صورتی که دستورها یا خروجی‌های واقعی با متن آن تفاوت داشته باشند
 
 ---
 

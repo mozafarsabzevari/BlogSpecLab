@@ -55,7 +55,7 @@ Authorization: Bearer <token>
 
 | کد HTTP | مقدار `code` | زمان استفاده |
 |---------|--------------|--------------|
-| 400 | `InvalidTitle`، `InvalidBody`، `ReturnReasonRequired`، `InvalidIfMatch` | ورودی نامعتبر |
+| 400 | `InvalidTitle`، `InvalidBody`، `ReturnReasonRequired`، `InvalidIfMatch`، `InvalidStatus` | ورودی نامعتبر |
 | 401 | `Unauthenticated` | Token ارسال نشده، نامعتبر یا منقضی است، یا کاربر غیرفعال است |
 | 403 | `Forbidden`، `SelfApprovalNotAllowed` | نقش ذخیره‌شدهٔ کاربر کافی نیست، یا تأیید پست توسط نویسندهٔ خودش |
 | 404 | `NotFound` | پست وجود ندارد یا برای این کاربر قابل مشاهده نیست (R-13) |
@@ -144,7 +144,7 @@ If-Match: "6f1c2b0e-3d4a-4f7e-9a51-2c8d0b7e4a11"
 
 | اقدام | متد و مسیر | بدنهٔ درخواست | پاسخ موفق | خطاهای خاص | مرجع |
 |-------|------------|---------------|-----------|-------------|------|
-| فهرست براساس وضعیت | `GET /api/editor/posts?status=...` | — | 200 و فهرست `EditorPostSummary` | 400 برای وضعیت نامعتبر | FR-007، FR-015 |
+| فهرست براساس وضعیت | `GET /api/editor/posts?status=...` | — | 200 و فهرست `EditorPostSummary` | 400 با `InvalidStatus` برای وضعیت نامعتبر | FR-007، FR-015 |
 | مشاهدهٔ پست و سابقه | `GET /api/editor/posts/{id}` | — | 200 و `EditorPostDetail` | 404 | FR-011 |
 | مشاهدهٔ سابقهٔ پست در هر وضعیت | `GET /api/editor/posts/{id}/history` | — | 200 و `EditorPostHistory` | 404 فقط برای پست ناموجود | FR-011 |
 | تأیید | `POST /api/editor/posts/{id}/approve` + `If-Match` | — | 200 و `EditorPostDetail` | 403 با `SelfApprovalNotAllowed`؛ 404؛ 409؛ 412؛ 428 | FR-007، FR-013، FR-014 |
