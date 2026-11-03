@@ -1,0 +1,170 @@
+`/speckit-implement`
+
+پیاده‌سازی Feature فعال `001-blog-post-management` را از وضعیت فعلی ادامه بده.
+
+در این اجرا فقط **فاز ۶ — Polish و بررسی‌های نهایی** از `tasks.md` را انجام بده.
+
+فقط وظایف زیر مجاز به اجرا هستند:
+
+- T058 (بررسی Project Referenceها و بسته‌ها)
+- T059 (بررسی نبود Secret)
+- T060 (اجرای کامل quickstart.md)
+- T061 (اصلاح quickstart.md)
+
+به‌علاوهٔ دو اصلاح مستنداتی که صریحاً تأیید کرده‌ام (بخش «اصلاحات مستنداتی تأییدشده»).
+
+هیچ Task یا Feature دیگری را آغاز نکن.
+
+## هدف این فاز
+
+در پایان این اجرا باید با شواهد واقعی نشان دهیم:
+
+- جهت وابستگی‌ها و بسته‌ها با Constitution (اصل II) سازگار است و هیچ وابستگی AI، MCP، RAG یا Qdrant وجود ندارد.
+- هیچ Token، Secret یا Connection String حساسی در کد، Log یا Repository نیست.
+- پروژه از صفر قابل Restore، Build، Test و Run است و quickstart.md براساس اجرای واقعی نوشته شده است.
+- رفتار واقعی Endpointها با `contracts/http-api.md` مطابقت دارد.
+- Success Criteriaهای قابل اثبات خودکار شاهد دارند و SC-004 و SC-005 صادقانه از آزمون خودکار جدا شده‌اند.
+
+## نحوهٔ اجرا
+
+1. وضعیت فعلی `tasks.md` را بررسی کن و تأیید کن T001 تا T057 و T062 قبلاً تکمیل شده‌اند.
+
+2. Artifactهای تأییدشدهٔ Feature (`spec.md`، `plan.md`، `research.md`، `data-model.md`، `contracts/http-api.md`، `quickstart.md`)، Constitution، Technical Baseline و `AGENTS.md` را مطابق Workflow پروژه رعایت کن.
+
+3. ترتیب اجرا:
+   - T058 و T059 (قابل اجرای موازی).
+   - T060 پس از T058 و T059.
+   - T061 پس از T060، براساس تفاوت‌های واقعی مشاهده‌شده.
+   - ایجاد `validation.md` پس از T058 تا T061.
+
+## T058 — Project Referenceها، بسته‌ها و مرزها
+
+- Project Referenceهای همهٔ فایل‌های `.csproj` را با plan.md و اصل II در Constitution تطبیق بده:
+  Application → Domain؛ DataAccess → Application و Domain؛ Api → Application و DataAccess؛ Tests → Domain، Application و Api.
+- بسته‌ها فقط همان‌هایی باشند که T003 و پروژهٔ آزمون لازم دارند؛ هیچ بستهٔ AI، MCP، RAG، Qdrant یا Swagger/OpenAPI وجود نداشته باشد.
+- بررسی کن Domain و Application به EF Core، ASP.NET Core یا HTTP وابسته نیستند و `DbContext`/`IQueryable` به Core نشت نکرده است.
+- بررسی کن Business Logic در Endpointها یا DataAccess تکرار نشده است.
+- مسیرها، HTTP Methodها، status codeها، `ProblemDetails.code`ها، `ETag`/`If-Match` و مدل‌های پاسخ (`AuthorPostSummary`، `AuthorPostDetail`، `EditorPostSummary`، `EditorPostDetail`، `EditorPostHistory`، `PublicPostSummary`، `PublicPostDetail`) را با `contracts/http-api.md` تطبیق بده.
+- OpenAPI ایجاد نکن؛ تطبیق قرارداد فقط با بررسی کد و رفتار واقعی انجام شود.
+- اگر اختلافی پیدا شد، ابتدا مشخص کن کدام منبع معتبر است. اختلاف ناشی از Implementation را گزارش کن و فقط در صورتی اصلاح کن که رفتار جدیدی ایجاد نکند؛ اختلاف ناشی از Artifact را بدون تأیید من اصلاح نکن (به‌جز `InvalidStatus` که تأیید شده است).
+
+## T059 — Secret و Credential
+
+- کد، فایل‌های تنظیمات، مستندات و آزمون‌ها را برای Token، Secret، API Key یا Connection String حساس بررسی کن.
+- به‌ویژه `src/03.Endpoints/Api/Provisioning/ProvisioningCommands.cs` و `src/03.Endpoints/Api/Authentication/OpaqueTokenAuthenticationHandler.cs` را بررسی کن: Token خام فقط یک بار در خروجی دستور Provision چاپ شود و در Log یا پایگاه داده ثبت نشود (فقط Hash).
+- بررسی کن فایل پایگاه دادهٔ محلی (`*.db`) در `.gitignore` مستثنا است.
+- `Prompts/` و `consider/` را جزو این بررسی تغییر نده.
+
+## T060 — اجرای کامل quickstart.md
+
+همهٔ دستورها را از ریشهٔ Repository و روی یک فایل SQLite تازه اجرا کن. پیش از اجرای هر دستور ترمینال از من اجازه بگیر.
+
+1. `dotnet --version` (بررسی .NET 10 SDK).
+2. `dotnet restore BlogSpecLab.slnx`.
+3. `dotnet build BlogSpecLab.slnx`.
+4. `dotnet test BlogSpecLab.slnx` و ثبت تعداد Passed / Failed / Skipped.
+5. `dotnet ef --version`: در Repository فایل `.config/dotnet-tools.json` وجود ندارد. اگر ابزار سراسری `dotnet-ef` نصب نیست، آن را نصب نکن و Tool Manifest نساز؛ متوقف شو و گزارش بده.
+6. `dotnet ef database update` با همان دستور quickstart.md؛ Migrationهای `InitialIdentity` و `AddPosts` فقط روی پایگاه دادهٔ محلی توسعه اعمال شوند. مسیر واقعی فایل SQLite ایجادشده را ثبت کن.
+7. ساخت چهار کاربر نمونهٔ quickstart.md با `provision-user` و بررسی `issue-token`. Tokenها را فقط در همان نشست استفاده کن و در هیچ فایل، Commit، گزارش یا Log ثبت نکن.
+8. `dotnet run --project src/03.Endpoints/Api` و اجرای واقعی مسیر اصلی با درخواست HTTP:
+   - Author: Create → Edit → Submit
+   - Editor: Return با دلیل → Author: Edit → Submit دوباره → Editor دیگر: Approve → Publish
+   - Public: مشاهدهٔ پست منتشرشده در `GET /api/posts` و `GET /api/posts/{id}`
+   - دریافت `ETag` و استفاده از `If-Match` در هر فرمان
+9. حداقل این شکست‌ها را واقعاً اجرا کن و status و `ProblemDetails.code` را ثبت کن:
+   - بدون Token یا با Token نادرست → 401 `Unauthenticated`
+   - تأیید پست خود توسط ویراستار ۱ → 403 `SelfApprovalNotAllowed`
+   - `If-Match` قدیمی → 412 `StaleVersion` همراه `currentStatus` و `currentVersion`
+   - ویرایش پست `Published` بدون تأیید پیامد → 409 `ConfirmationRequired`
+   - حذف پست `Published` → 409 `InvalidStatusTransition`
+   - دسترسی نویسندهٔ ب به پست نویسندهٔ الف → 404؛ پست منتشرنشده در مسیر عمومی → 404
+10. سناریوهای ۱، ۴ و ۵ را با HTTP اجرا کن؛ اما سنجش زمان SC-004 (کمتر از ۵ دقیقه) و SC-005 (کمتر از ۱ دقیقه) فقط توسط انسان قابل انجام است:
+    - نتیجهٔ زمانی، تعداد شرکت‌کننده یا درصد موفقیت جعل نکن.
+    - معیارهای Spec را تغییر نده؛ حداقل ۵ Author و ۵ Editor یا آستانهٔ ۹۰٪ را اضافه نکن.
+    - `acceptance.md` ایجاد نکن.
+    - اگر من زمان‌سنجی را واقعاً انجام و نتیجه را اعلام نکرده‌ام، T060 باید `[ ]` بماند و بخش خودکار آن در `validation.md` با وضعیت «سنجش انسانی هنوز انجام نشده» ثبت شود.
+
+## T061 — اصلاح quickstart.md
+
+فقط براساس نتایج واقعی T060 اصلاح کن:
+
+- یادداشت ابتدای فایل («هنوز Solution و پروژه‌ها ساخته نشده‌اند») را حذف یا با وضعیت واقعی جایگزین کن.
+- سناریوی ۱۶ را اصلاح کن: تصمیم دوم فقط وقتی 412 با `StaleVersion` می‌گیرد که تصمیم اول `Approve` باشد؛ پس از `Return` پست برای ویراستار دیده نمی‌شود (R-13) و پاسخ 404 است.
+- هر دستور، مسیر فایل یا خروجی که با اجرای واقعی تفاوت دارد اصلاح شود.
+- مفاهیم خارج از Artifactها (`allowedActions`، `PostView`، `PublicPostView`، Request Changes، کدهای snake_case، `503`، دستور Revoke یا `tool restore`) وارد نشوند؛ لغو دسترسی همان حذف Token یا نقش از پایگاه داده است (سناریوهای ۲۲ و ۲۳).
+- هیچ Token یا Credential واقعی در فایل ثبت نشود.
+- ساختار فعلی سند و قالب `<div dir="rtl">` با بلوک‌های کد خارج از آن حفظ شود.
+
+## validation.md
+
+فایل `specs/001-blog-post-management/validation.md` را به فارسی، داخل `<div dir="rtl">` و با بلوک‌های کد خارج از آن، کوتاه ایجاد کن. فقط نتایج واقعی ثبت شوند:
+
+- نتیجهٔ Restore، Build (تعداد Warning) و Test (Passed / Failed / Skipped).
+- نتیجهٔ T058: Project Referenceها، بسته‌ها، استقلال Core، نبود Business Logic در Api و DataAccess، نبود وابستگی AI/MCP/RAG/Qdrant و تطبیق رفتار با `contracts/http-api.md`.
+- نتیجهٔ T059: نبود Secret ثابت.
+- نتیجهٔ T060: دستورهای اجراشده، مسیر SQLite، مسیر اصلی و شکست‌های اجراشده با status و code؛ بدون Token یا متن خصوصی.
+- شواهد SC-001، SC-002، SC-003 و SC-006: معیار، سناریوهای quickstart.md، فایل‌های آزمون پوشش‌دهنده، نتیجهٔ آزمون و در صورت ارتباط شواهد HTTP.
+- وضعیت SC-004 و SC-005: صریحاً ذکر شود که سبز بودن آزمون‌ها جایگزین آن‌ها نیست و سنجش انسانی هنوز انجام نشده است (مگر اینکه من نتیجهٔ واقعی را اعلام کرده باشم).
+- محدودیت‌ها: اجرای محلی با SQLite، اعمال Migration فقط روی پایگاه دادهٔ محلی، ابزار سراسری `dotnet-ef` و هر مشکل باقی‌مانده.
+
+## اصلاحات مستنداتی تأییدشده
+
+### InvalidStatus در قرارداد
+
+- کد `InvalidStatus` را که `GET /api/editor/posts?status=` برای وضعیت نامعتبر برمی‌گرداند (`ProblemDetailsMapping.InvalidStatus`) به ردیف 400 جدول خطاهای `contracts/http-api.md` و به ستون خطای همان مسیر اضافه کن.
+- رفتار کد را تغییر نده.
+- اگر `data-model.md` یا Artifact دیگری هم به این کد نیاز داشت، تغییر نده و فقط گزارش کن.
+
+### I1 — برچسب «کاندید Technical Baseline»
+
+- ابتدا تأیید کن R-01 تا R-09 در `docs/architecture/technical-baseline.md` ثبت و تأیید شده‌اند. اگر هر موردی آنجا نیست یا متفاوت است، این اصلاح را انجام نده و گزارش کن.
+- در `plan.md` (ردیف اصل VI در Constitution Check و بخش «کاندیدهای Technical Baseline پروژه») و `research.md` (توضیح برچسب‌ها و عنوان بخش الف)، برچسب «کاندید» را با وضعیت واقعی «تثبیت‌شده در Technical Baseline» همراه پیوند به همان سند جایگزین کن.
+- محتوای تصمیم‌ها و شناسه‌های R-01 تا R-20 را تغییر نده؛ R-18 تا R-20 همچنان «محدود به این قابلیت» بمانند.
+- `docs/architecture/technical-baseline.md` را تغییر نده.
+
+## مرزهای معماری
+
+- Core نباید به EF Core، ASP.NET Core یا جزئیات HTTP وابسته شود.
+- Endpointها نازک باقی بمانند و DataAccess تصمیم کسب‌وکاری نگیرد.
+- Project Referenceها مطابق Constitution (اصل II) باقی بمانند.
+
+## مدیریت tasks.md
+
+- T058، T059 و T061 فقط در صورت تکمیل و بررسی واقعی `[X]` شوند.
+- T060 فقط وقتی `[X]` شود که هم بخش خودکار واقعاً اجرا شده باشد و هم من نتیجهٔ واقعی سنجش SC-004 و SC-005 را اعلام کرده باشم.
+- Task جدیدی به `tasks.md` اضافه نکن.
+
+## محدودیت Scope
+
+در این اجرا:
+
+- OpenAPI، Swagger UI یا هر Package جدیدی اضافه نکن.
+- `acceptance.md` ایجاد نکن و معیار پذیرش انسانی معلم (۵ Author، ۵ Editor، ۹۰٪) را وارد نکن.
+- Behavior کسب‌وکاری، Endpoint، کد خطا یا Migration جدید ایجاد نکن.
+- `AGENTS.md` را تغییر نده، مگر اینکه دستورهای Build/Test بخش ۷ با اجرای واقعی تفاوت داشته باشند.
+- `spec.md`، `docs/architecture/technical-baseline.md`، `Prompts/` و `consider/` را تغییر نده.
+- Artifactهای SDD را فقط در حد همین Taskها و اصلاحات تأییدشده تغییر بده.
+- AI، MCP، RAG، Qdrant یا Agent اضافه نکن.
+- نتیجهٔ آزمون یا پذیرش انسانی را جعل نکن.
+
+اگر برای تکمیل یکی از Taskها نیاز به تغییر Spec، Plan، Contract یا Taskها (خارج از اصلاحات تأییدشده) پیدا شد، همان‌جا متوقف شو و مسئله را گزارش کن.
+
+## گزارش پایان
+
+در پایان گزارش کن:
+
+1. وضعیت T058 تا T061 به تفکیک.
+2. فایل‌های ایجاد یا تغییرکرده.
+3. نتیجهٔ بررسی Project Referenceها، بسته‌ها و مرزها.
+4. نتیجهٔ بررسی Secret.
+5. نتیجهٔ تطبیق رفتار با `contracts/http-api.md` و اصلاح `InvalidStatus`.
+6. نتیجهٔ اصلاح I1.
+7. دستورهای اجراشدهٔ quickstart و تغییرات quickstart.md.
+8. خلاصهٔ validation.md و شواهد SC-001، SC-002، SC-003 و SC-006.
+9. وضعیت واقعی SC-004 و SC-005.
+10. نتیجهٔ Restore، Build و Test و تعداد Passed / Failed / Skipped.
+11. Taskهایی که `[X]` شده‌اند و Taskهای باقی‌مانده.
+12. هر مشکل یا بدهی باقی‌مانده.
+13. تأیید کن هیچ Feature بعدی یا قابلیت AI آغاز نشده است.
+
+پس از گزارش متوقف شو و منتظر دستور بعدی بمان.
