@@ -17,7 +17,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -35,7 +35,7 @@
 
 ## Notes
 
-- یک نشانگر [NEEDS CLARIFICATION] در FR-013 باقی است (ذخیره‌شدن نتیجه و دسترسی ویراستار به آن).
+- نشانگر FR-013 در جلسهٔ 2026-11-11 برطرف شد: نتیجه ذخیره می‌شود و فقط برای نویسنده قابل مشاهده است.
 - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
 
 </div>
