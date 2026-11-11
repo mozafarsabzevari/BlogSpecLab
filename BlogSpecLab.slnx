@@ -8,6 +8,9 @@
     <Project Path="src/01.Core/Domain/BlogSpecLab.Core.Domain.csproj" />
   </Folder>
   <Folder Name="/src/02.Infra/" />
+  <Folder Name="/src/02.Infra/AI/">
+    <Project Path="src/02.Infra/AI/BlogSpecLab.Infra.AI.csproj" />
+  </Folder>
   <Folder Name="/src/02.Infra/DataAccess/">
     <Project Path="src/02.Infra/DataAccess/BlogSpecLab.Infra.DataAccess.csproj" />
   </Folder>

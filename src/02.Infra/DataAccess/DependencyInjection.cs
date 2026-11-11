@@ -1,5 +1,7 @@
 using BlogSpecLab.Core.Application.Common;
+using BlogSpecLab.Core.Application.ContentReviews;
 using BlogSpecLab.Core.Application.Posts;
+using BlogSpecLab.Infra.DataAccess.ContentReviews;
 using BlogSpecLab.Infra.DataAccess.Identity;
 using BlogSpecLab.Infra.DataAccess.Posts;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IAccessTokenReader, AccessTokenReader>();
         services.AddScoped<LocalProvisioner>();
         services.AddScoped<IPostRepository, PostRepository>();
+        services.AddScoped<IContentReviewRepository, ContentReviewRepository>();
 
         return services;
     }

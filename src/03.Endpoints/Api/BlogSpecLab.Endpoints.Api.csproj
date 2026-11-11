@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\01.Core\Application\BlogSpecLab.Core.Application.csproj" />
+    <ProjectReference Include="..\..\02.Infra\AI\BlogSpecLab.Infra.AI.csproj" />
     <ProjectReference Include="..\..\02.Infra\DataAccess\BlogSpecLab.Infra.DataAccess.csproj" />
   </ItemGroup>
 
@@ -14,6 +15,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <UserSecretsId>blogspeclab-endpoints-api</UserSecretsId>
   </PropertyGroup>
 
 </Project>

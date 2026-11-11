@@ -1,4 +1,6 @@
+using BlogSpecLab.Core.Domain.ContentReviews;
 using BlogSpecLab.Core.Domain.Posts;
+using BlogSpecLab.Infra.DataAccess.ContentReviews;
 using BlogSpecLab.Infra.DataAccess.Identity;
 using BlogSpecLab.Infra.DataAccess.Posts;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,8 @@ public sealed class BlogSpecLabDbContext(DbContextOptions<BlogSpecLabDbContext> 
 
     public DbSet<StatusChange> PostStatusChanges => Set<StatusChange>();
 
+    public DbSet<ContentReview> ContentReviews => Set<ContentReview>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UserRecordConfiguration());
@@ -24,5 +28,6 @@ public sealed class BlogSpecLabDbContext(DbContextOptions<BlogSpecLabDbContext> 
         modelBuilder.ApplyConfiguration(new AccessTokenRecordConfiguration());
         modelBuilder.ApplyConfiguration(new PostConfiguration());
         modelBuilder.ApplyConfiguration(new StatusChangeConfiguration());
+        modelBuilder.ApplyConfiguration(new ContentReviewConfiguration());
     }
 }

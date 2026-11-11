@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blogspeclab/schemas/content_review_v1.json",
+  "title": "content_review_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["outcome", "issues", "missing_information"],
+  "properties": {
+    "outcome": {
+      "type": "string",
+      "enum": ["completed", "needs_input"]
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "severity", "location", "excerpt", "explanation", "suggestion"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "spelling_and_writing",
+              "grammar",
+              "clarity",
+              "structure_and_coherence",
+              "title_body_mismatch",
+              "claim_needs_source"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "location": {
+            "type": "string",
+            "enum": ["title", "body"]
+          },
+          "excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "suggestion": {
+            "type": ["string", "null"],
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "missing_information": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  }
+}

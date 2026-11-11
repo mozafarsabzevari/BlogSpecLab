@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\01.Core\Domain\BlogSpecLab.Core.Domain.csproj" />
     <ProjectReference Include="..\..\src\01.Core\Application\BlogSpecLab.Core.Application.csproj" />
+    <ProjectReference Include="..\..\src\02.Infra\AI\BlogSpecLab.Infra.AI.csproj" />
     <ProjectReference Include="..\..\src\03.Endpoints\Api\BlogSpecLab.Endpoints.Api.csproj" />
   </ItemGroup>
 

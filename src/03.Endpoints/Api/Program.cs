@@ -1,9 +1,12 @@
 using System.Text.Json.Serialization;
 using BlogSpecLab.Core.Application.Common;
+using BlogSpecLab.Core.Application.ContentReviews;
 using BlogSpecLab.Core.Application.Posts;
 using BlogSpecLab.Endpoints.Api.Authentication;
+using BlogSpecLab.Endpoints.Api.ContentReviews;
 using BlogSpecLab.Endpoints.Api.Posts;
 using BlogSpecLab.Endpoints.Api.Provisioning;
+using BlogSpecLab.Infra.AI;
 using BlogSpecLab.Infra.DataAccess;
 using Microsoft.AspNetCore.Authentication;
 
@@ -30,6 +33,18 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddScoped<AuthorPostService>();
 builder.Services.AddScoped<EditorPostService>();
 builder.Services.AddScoped<PublicPostQueries>();
+
+var contentReviewDeadline = new ContentReviewDeadlineOptions
+{
+    TimeoutSeconds = builder.Configuration.GetValue(
+        "ContentReview:TimeoutSeconds", ContentReviewDeadlineOptions.DefaultTimeoutSeconds)
+};
+contentReviewDeadline.Validate();
+
+builder.Services.AddSingleton(contentReviewDeadline);
+builder.Services.AddSingleton<ContentReviewValidator>();
+builder.Services.AddScoped<ContentReviewService>();
+builder.Services.AddContentReviewModel(builder.Configuration);
 
 var app = builder.Build();
 
@@ -60,6 +75,7 @@ app.UseAuthorization();
 app.MapAuthorEndpoints();
 app.MapEditorEndpoints();
 app.MapPublicEndpoints();
+app.MapContentReviewEndpoints();
 
 app.Run();
 return 0;

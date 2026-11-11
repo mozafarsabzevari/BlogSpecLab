@@ -7,8 +7,24 @@
 ## پیش‌شرط
 
 - `specs/002-ai-content-review/tasks.md` باید وجود داشته باشد. اگر وجود ندارد، متوقف شو و گزارش بده.
-- شمارهٔ Taskها در این پروژه با شمارهٔ Taskهای دورهٔ آموزشی متفاوت است. پیش از اجرا، هر بخش این Prompt را براساس Phase و شرح Task به Taskهای `tasks.md` همین پروژه نگاشت کن، نگاشت را نمایش بده و پیش از شروع تأیید بگیر.
+- شمارهٔ Taskها در این پروژه با شمارهٔ Taskهای دورهٔ آموزشی متفاوت است. نگاشت زیر براساس Phase و شرح Task انجام شده و مرجع اجراست؛ آن را پیش از شروع نمایش بده و تأیید بگیر.
 - پیش از اجرای هر دستور Terminal اجازه بگیر.
+
+## نگاشت به `tasks.md` همین پروژه
+
+| بخش این Prompt | Taskهای `tasks.md` |
+| --- | --- |
+| پروژهٔ `Infra.AI`، Package، تنظیمات `ContentReview` و Schema جاسازی‌شده | T001–T004 |
+| موجودیت `ContentReview`، قواعد سازگاری و آزمون Domain | T005–T008 |
+| قراردادهای Application، کدهای خطا و تنظیمات Deadline | T009–T012 |
+| ذخیره‌سازی در `Infra.DataAccess` و ایجاد Migration | T013–T015 |
+| نگاشت ProblemDetails، `IContentReviewModel` جعلی و test fixtures | T016–T017 |
+| Validator، Service، Prompt، Adapter مبتنی بر Responses API برای xAI، Structured Output، Parser، DI و Configuration، HTTP endpointها و DTOها، FR-013 و آزمون‌های آن‌ها | T018–T029 |
+| مسیر `needs_input` | T030–T033 |
+| Non-Mutation، Timeout، Privacy و Logging، Concurrency و سخت‌کردن | T034–T039 |
+| Corpus، Evaluation protocol، کد Smoke test و کد اجراکنندهٔ Evaluation | T040–T043 |
+| بررسی وابستگی‌ها و Secretها، تکمیل Quickstart | T044–T045 |
+| اجرای واقعی (به مرحلهٔ بعد موکول) | T046–T050 |
 
 ## دامنهٔ اجرا
 
@@ -44,15 +60,14 @@
 
 ## Taskهایی که در این مرحله عمداً اجرا و تکمیل نمی‌شوند
 
-Taskهایی از `tasks.md` که به یکی از موارد زیر وابسته‌اند را انجام‌شده علامت نزن:
+Taskهای زیر را انجام‌شده علامت نزن:
 
-- اجرای واقعی Suite آزمون‌ها و ثبت Pass/Fail
-- فراخوانی واقعی Provider xAI (Smoke test)
-- اجرای Quality Evaluation با Model واقعی
-- Human Evaluation
-- ثبت شواهد نهایی Validation و Acceptance
-
-پیش از شروع، فهرست دقیق شناسهٔ این Taskها را از `tasks.md` همین پروژه استخراج و همراه نگاشت نمایش بده.
+- `T029`، `T033` و `T039`: کد آن‌ها نوشته شود، اما اجرای آزمون‌ها و رفع اشکال براساس نتیجه به مرحلهٔ بعد موکول است
+- `T046`: اجرای واقعی Suite آزمون‌ها و ثبت Validation
+- `T047`: فراخوانی واقعی Provider xAI (Smoke test)
+- `T048`: اجرای Quality Evaluation با `grok-4.7`
+- `T049`: Human Evaluation
+- `T050`: ثبت شواهد نهایی Acceptance
 
 علت:
 
@@ -99,7 +114,7 @@ Taskهایی که می‌گویند Test Code ایجاد شود باید اکن�
 
 این کار فقط Development Check محسوب می‌شود.
 
-اجرای build را جایگزین Validation، Test یا Acceptance معرفی نکن و به‌دلیل اجرای build، Task مربوط به Validation را تکمیل‌شده علامت نزن.
+اجرای build را جایگزین Validation، Test یا Acceptance معرفی نکن و به‌دلیل اجرای build، `T046` را تکمیل‌شده علامت نزن.
 
 ## xAI
 
@@ -175,7 +190,7 @@ AI نباید:
 
 هر Taskی که واقعاً پیاده‌سازی آن تمام شد در `tasks.md` به `[X]` تغییر کند.
 
-Taskهای تعویق‌داده‌شده باید `[ ]` باقی بمانند.
+هشت Task تعویق‌داده‌شده (`T029`، `T033`، `T039` و `T046` تا `T050`) باید `[ ]` باقی بمانند.
 
 اگر Task دیگری بدون اجرای تست/Eval قابل تکمیل نیست، نتیجهٔ ساختگی ایجاد نکن؛ آن را باز نگه دار و در گزارش نهایی دلیلش را مشخص کن.
 
@@ -186,6 +201,8 @@ Feature بعدی را شروع نکن.
 Tool Calling، MCP، RAG، Qdrant و Agent وارد این Feature نشوند.
 
 Package جدیدی غیر از `OpenAI 2.14.0` اضافه نکن، مگر اینکه `tasks.md` آن را مشخص کرده باشد؛ در غیر این صورت ابتدا گزارش بده.
+
+OpenAPI metadata در این مرحله اضافه نشود، چون Package جدیدی لازم دارد که در Plan نیست.
 
 Migration را روی پایگاه داده اعمال نکن.
 

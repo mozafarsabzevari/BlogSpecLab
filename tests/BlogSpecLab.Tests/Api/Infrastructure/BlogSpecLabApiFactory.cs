@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using BlogSpecLab.Core.Application.ContentReviews;
 using BlogSpecLab.Infra.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -27,6 +28,9 @@ public sealed class BlogSpecLabApiFactory : WebApplicationFactory<Program>
 
     public ManualTimeProvider Time { get; } = new(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
+    /// <summary>Replaces the real model, so that no test reaches the provider.</summary>
+    public FakeContentReviewModel ContentReviewModel { get; } = new();
+
     public HttpClient CreateClientWithToken(string rawToken)
     {
         var client = CreateClient();
@@ -48,6 +52,9 @@ public sealed class BlogSpecLabApiFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(Time);
+
+            services.RemoveAll<IContentReviewModel>();
+            services.AddSingleton<IContentReviewModel>(ContentReviewModel);
         });
     }
 

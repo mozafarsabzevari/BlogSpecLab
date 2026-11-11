@@ -8,7 +8,8 @@
 | تاریخ | 2026-11-11 |
 | طرح | [plan.md](./plan.md) |
 
-> این راهنما پیش از پیاده‌سازی نوشته شده و دستورهای آن هنوز اجرا و بررسی نشده‌اند.
+> کد و آزمون‌ها نوشته شده‌اند، اما هیچ‌یک از دستورهای این راهنما (Build، آزمون، Migration، Smoke و
+> Evaluation) هنوز اجرا و بررسی نشده است. نتیجهٔ اجرا در `validation.md` ثبت خواهد شد.
 
 ## پیش‌نیازها
 
@@ -47,16 +48,33 @@ dotnet user-secrets set "ContentReview:ApiKey" "<xai-api-key>" --project src/03.
 `Model` برابر `grok-4.7` و `TimeoutSeconds` برابر ۶۰) در `appsettings.json` پیش‌فرض دارند. بدون کلید،
 برنامه اجرا می‌شود و فقط درخواست بررسی پاسخ 503 می‌گیرد.
 
+تنظیمات عملیاتی بخش `ContentReview` (پروژهٔ `Infra.AI`):
+
+| کلید | پیش‌فرض | توضیح |
+|------|---------|-------|
+| `Endpoint` | `https://api.x.ai/v1` | آدرس پایهٔ Responses API در xAI |
+| `Model` | `grok-4.7` | تنها Model مجاز این قابلیت |
+| `ApiKey` | ندارد | فقط User Secrets (شناسهٔ `blogspeclab-endpoints-api`) یا `ContentReview__ApiKey` |
+| `TimeoutSeconds` | `60` | Deadline برنامه؛ مقدار خارج از ۱ تا ۶۰ هنگام شروع برنامه خطا می‌دهد |
+| `MaxOutputTokenCount` | `8000` | سقف Token خروجی هر درخواست |
+
+Retry خودکار SDK صفر است، `store` همیشه `false` است و Log فقط فرادادهٔ مجاز (شناسهٔ پست، Outcome، مدت،
+نام Model، شمار Token و شناسهٔ پاسخ Provider) را ثبت می‌کند.
+
 ## اجرای برنامه
 
 </div>
 
 ```powershell
+dotnet ef migrations add AddContentReviews --project src/02.Infra/DataAccess --startup-project src/03.Endpoints/Api
 dotnet ef database update --project src/02.Infra/DataAccess --startup-project src/03.Endpoints/Api
 dotnet run --project src/03.Endpoints/Api
 ```
 
 <div dir="rtl">
+
+Migration `AddContentReviews` هنوز ساخته نشده است؛ دستور اول فقط یک بار و پیش از `database update` لازم است.
+آزمون‌ها به Migration وابسته نیستند و پایگاه داده را با `EnsureCreated` در حافظه می‌سازند.
 
 کاربران نمونه همان کاربران راهنمای Feature قبلی هستند.
 
@@ -108,9 +126,16 @@ dotnet test BlogSpecLab.slnx --filter "Category=Evaluation"
 
 <div dir="rtl">
 
-- **Smoke:** یک پست کوتاه نمونه بررسی می‌شود و فقط شکل و قابل پردازش بودن پاسخ بررسی می‌شود، نه کیفیت آن.
-- **Evaluation:** Corpus برچسب‌دار اجرا و شواهد در `specs/002-ai-content-review/evaluation/` ثبت می‌شوند.
-  آستانه‌ها در research.md، R-12 آمده‌اند و پیش از اجرا تأیید انسانی می‌خواهند.
+- **Smoke** (`Category=ProviderSmoke`، فایل `tests/BlogSpecLab.Tests/Evaluation/ContentReviewProviderSmokeTests.cs`):
+  یک پست کوتاه نمونه بررسی می‌شود و فقط شکل و قابل پردازش بودن پاسخ بررسی می‌شود، نه کیفیت آن. نام Model
+  بازگشتی در خروجی آزمون نوشته می‌شود.
+- **Evaluation** (`Category=Evaluation`، فایل `tests/BlogSpecLab.Tests/Evaluation/ContentReviewEvaluationTests.cs`):
+  Corpus `tests/BlogSpecLab.Tests/Evaluation/Corpus/content_review_corpus_v1.json` اجرا و شواهد در
+  `specs/002-ai-content-review/evaluation/results/content-review-eval-<زمان>Z.json` ثبت می‌شوند. معیارها،
+  Rubric و آستانه‌ها در [evaluation/protocol.md](./evaluation/protocol.md) آمده‌اند؛ آستانه‌ها پیشنهادی‌اند،
+  از بخش `ContentReviewEvaluation` قابل تنظیم‌اند و پیش از پذیرش نتیجه تأیید انسانی می‌خواهند.
+- بدون `BLOGSPECLAB_PROVIDER_TESTS=1` یا بدون کلید، هر دو آزمون Skip می‌شوند.
+- این دو اجرا هنوز انجام نشده‌اند.
 
 ## معیار تکمیل
 

@@ -23,6 +23,14 @@ public static class ProblemDetailsMapping
                 => (StatusCodes.Status409Conflict, "وضعیت پست با این عملیات سازگار نیست."),
             ErrorCode.StaleVersion
                 => (StatusCodes.Status412PreconditionFailed, "نسخهٔ پست تغییر کرده است."),
+            ErrorCode.ReviewNotAvailable
+                => (StatusCodes.Status409Conflict, "بررسی هوشمند برای این پست در دسترس نیست."),
+            ErrorCode.ReviewOutputInvalid or ErrorCode.ReviewRefused
+                => (StatusCodes.Status502BadGateway, "بررسی هوشمند نتیجهٔ قابل نمایشی نداشت."),
+            ErrorCode.ReviewServiceUnavailable
+                => (StatusCodes.Status503ServiceUnavailable, "سرویس بررسی هوشمند در دسترس نیست."),
+            ErrorCode.ReviewTimedOut
+                => (StatusCodes.Status504GatewayTimeout, "زمان بررسی هوشمند به پایان رسید."),
             _ => throw new ArgumentOutOfRangeException(nameof(error), error.Code, "Unmapped error code.")
         };
 

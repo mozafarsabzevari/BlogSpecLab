@@ -14,7 +14,12 @@ public enum ErrorCode
     SelfApprovalNotAllowed,
     InvalidTitle,
     InvalidBody,
-    ReturnReasonRequired
+    ReturnReasonRequired,
+    ReviewNotAvailable,
+    ReviewOutputInvalid,
+    ReviewRefused,
+    ReviewServiceUnavailable,
+    ReviewTimedOut
 }
 
 /// <summary>
