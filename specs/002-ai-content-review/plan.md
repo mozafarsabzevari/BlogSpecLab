@@ -70,7 +70,7 @@
 | V.3 اجرا بدون مدل زبانی | بدون کلید، برنامه اجرا می‌شود و فقط این مسیر 503 می‌دهد (R-13). | ✅ |
 | V.4 و V.8 ورود مرحله‌ای AI | انتخاب Provider و Model در این قابلیت و با بررسی محدودیت‌ها و پیامدها (R-01، R-05) انجام شد. | ✅ |
 | V.5 Tool Calling و MCP | استفاده نمی‌شوند. | ✅ |
-| VI. حاکمیت | تصمیم‌های سراسری با برچسب «کاندید Technical Baseline پروژه» برای بازبینی انسانی مشخص شده‌اند؛ Constitution و Technical Baseline تغییر نمی‌کنند. | ✅ |
+| VI. حاکمیت | چهار تصمیم سراسری پس از بازبینی انسانی در Technical Baseline نسخهٔ 1.1.0 ثبت شدند؛ Constitution تغییر نمی‌کند. | ✅ |
 
 نتیجه: هیچ نقضی وجود ندارد.
 
@@ -176,10 +176,11 @@ Eval، در همان پروژهٔ `BlogSpecLab.Tests` با پوشه‌های ج�
 
 هیچ نقضی از Constitution وجود ندارد؛ بنابراین موردی برای توجیه ثبت نمی‌شود.
 
-## کاندیدهای Technical Baseline پروژه
+## تصمیم‌های ثبت‌شده در Technical Baseline
 
-تصمیم‌های زیر اثر سراسری بر همهٔ Integrationهای هوش مصنوعی آینده دارند و باید پیش از پذیرش، توسط انسان
-بازبینی شوند. جزئیات هر کدام در [research.md](./research.md) آمده است.
+تصمیم‌های زیر اثر سراسری بر همهٔ Integrationهای هوش مصنوعی آینده دارند. پس از بازبینی انسانی در
+2026-11-11 در بخش ۹ (AI Integration) نسخهٔ 1.1.0
+[Technical Baseline](../../docs/architecture/technical-baseline.md) ثبت شدند.
 
 | شناسه | تصمیم |
 |-------|-------|
@@ -188,9 +189,10 @@ Eval، در همان پروژهٔ `BlogSpecLab.Tests` با پوشه‌های ج�
 | AI-03 | Data Minimization و ثبت نکردن محتوای کاربر و خروجی مدل در Log به‌صورت پیش‌فرض |
 | AI-04 | تفکیک آزمون قطعی نرم‌افزار در CI از Evaluation نسخه‌دار کیفیت مدل |
 
-تصمیم‌های زیر عمداً محدود به این قابلیت هستند و کاندید Technical Baseline نیستند: Provider xAI، Model
-`grok-4.7`، Responses API، Package `OpenAI 2.14.0`، Schema `content_review_v1` و دسته‌های آن، Prompt،
-Deadline ۶۰ ثانیه‌ای، تنظیم Reasoning، ذخیرهٔ نتیجه برای نویسنده، Dataset و آستانه‌های Eval.
+تصمیم‌های زیر عمداً محدود به این قابلیت هستند و وارد Technical Baseline نشدند: Provider xAI و Endpoint
+`https://api.x.ai/v1`، Model `grok-4.7`، Responses API، Package `OpenAI 2.14.0`، ریسک نگهداری داده در
+xAI، Schema `content_review_v1` و دسته‌های آن، Prompt، فیلدهای ارسالی `title` و `body`، Deadline ۶۰
+ثانیه‌ای، تنظیم Reasoning، ذخیرهٔ نتیجه فقط برای نویسندهٔ پست (FR-013)، Dataset و آستانه‌های Eval.
 
 ## نکات باز پیش از Tasks
 

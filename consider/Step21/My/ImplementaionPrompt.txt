@@ -1,0 +1,212 @@
+`$speckit-implement`
+
+تمام بخش‌های کدنویسی و آماده‌سازی Feature فعال `002-ai-content-review` را براساس `tasks.md`، Specification، Plan، Research، قراردادها، Constitution و Technical Baseline پیاده‌سازی کن.
+
+در این مرحله قصد داریم کدنویسی Feature را کامل کنیم، اما اجرای تست‌ها، Evaluation واقعی و تأیید نهایی عملکرد عمداً به کارگاه بعدی موکول شده است.
+
+## پیش‌شرط
+
+- `specs/002-ai-content-review/tasks.md` باید وجود داشته باشد. اگر وجود ندارد، متوقف شو و گزارش بده.
+- شمارهٔ Taskها در این پروژه با شمارهٔ Taskهای دورهٔ آموزشی متفاوت است. پیش از اجرا، هر بخش این Prompt را براساس Phase و شرح Task به Taskهای `tasks.md` همین پروژه نگاشت کن، نگاشت را نمایش بده و پیش از شروع تأیید بگیر.
+- پیش از اجرای هر دستور Terminal اجازه بگیر.
+
+## دامنهٔ اجرا
+
+تمام Taskهای قابل پیاده‌سازی را انجام بده، شامل:
+
+- ایجاد پروژهٔ `src/02.Infra/AI/BlogSpecLab.Infra.AI.csproj`، افزودن آن به `BlogSpecLab.slnx` و اتصال آن به `Endpoints.Api` و `Tests`
+- موجودیت `ContentReview` و قواعد سازگاری آن در `Core.Domain`
+- قراردادهای Application: `IContentReviewModel`، `IContentReviewRepository` و مدل‌های ورودی و خروجی
+- ذخیرهٔ نتیجه در `Infra.DataAccess`: پیکربندی EF Core، `ContentReviewRepository` و یک Migration جدید (فقط ایجاد Migration؛ اعمال آن روی پایگاه داده جزو این مرحله نیست)
+- Deadline و Cancellation با `TimeProvider`
+- `ContentReviewService`
+- `ContentReviewValidator` مستقل
+- Prompt نسخه‌دار `content-review-prompt-v1`
+- Strict output parser
+- Adapter مبتنی بر Responses API برای xAI
+- Structured Output با Schema موجود
+- تفکیک completed / needs_input / refusal / failure
+- ذخیرهٔ نتیجهٔ معتبر فقط برای نویسندهٔ پست و فهرست نتیجه‌ها با `isCurrentVersion` (FR-013)
+- دو HTTP endpoint نویسنده و DTOها طبق `contracts/http-api.md`
+- DI و Configuration بخش `ContentReview`
+- Data Minimization و حفاظت Logging
+- Freshness و recheck
+- مدیریت درخواست‌های هم‌زمان و timeout
+- راهنمای Quickstart و تنظیمات عملیاتی
+- تمام Unit/Integration test code
+- `IContentReviewModel` جعلی و test fixtures
+- Corpus ارزیابی
+- Evaluation protocol
+- Provider smoke-test code
+- Quality evaluation runner code
+
+تست‌ها و Evaluation infrastructure باید نوشته و آمادهٔ اجرا باشند؛ هدف این است که جلسهٔ بعد بتوانیم مستقیماً وارد Test، Debug، Evaluation و Acceptance شویم.
+
+## Taskهایی که در این مرحله عمداً اجرا و تکمیل نمی‌شوند
+
+Taskهایی از `tasks.md` که به یکی از موارد زیر وابسته‌اند را انجام‌شده علامت نزن:
+
+- اجرای واقعی Suite آزمون‌ها و ثبت Pass/Fail
+- فراخوانی واقعی Provider xAI (Smoke test)
+- اجرای Quality Evaluation با Model واقعی
+- Human Evaluation
+- ثبت شواهد نهایی Validation و Acceptance
+
+پیش از شروع، فهرست دقیق شناسهٔ این Taskها را از `tasks.md` همین پروژه استخراج و همراه نگاشت نمایش بده.
+
+علت:
+
+این Taskها به اجرای واقعی تست، Provider، Quality Evaluation، Human Evaluation یا ثبت شواهد نهایی Acceptance وابسته‌اند و قرار است در مرحلهٔ بعد به‌صورت آموزشی اجرا شوند.
+
+فایل‌ها و زیرساخت لازم برای اجرای آن‌ها را اکنون آماده کن، اما نتیجهٔ ساختگی ثبت نکن.
+
+آستانه‌های Eval در research.md (R-12) هنوز پیشنهادی هستند؛ آن‌ها را در کد به‌عنوان مقدار قابل تنظیم قرار بده و تأییدشده معرفی نکن.
+
+## دربارهٔ تست‌ها
+
+Taskهایی که می‌گویند Test Code ایجاد شود باید اکنون پیاده‌سازی شوند.
+
+صرفاً به این دلیل که اجرای تست به جلسهٔ بعد موکول شده، نوشتن Test Code را حذف نکن.
+
+بنابراین تست‌های مربوط به:
+
+- Domain (قواعد سازگاری `ContentReview`)
+- Application
+- Validator
+- Transport (Transport جعلی HTTP برای `Infra.AI`)
+- Protocol
+- HTTP
+- needs_input
+- Non-Mutation
+- Concurrency
+- Timeout
+- Privacy
+- Configuration
+- Persistence و دسترسی فقط نویسنده (FR-013)
+- برابری Schema جاسازی‌شده با `contracts/model-output.schema.json`
+- Provider opt-in
+- Quality Eval
+
+باید اکنون وجود داشته باشند.
+
+آزمون‌های Provider و Eval فقط با متغیر محیطی `BLOGSPECLAB_PROVIDER_TESTS=1` اجرا شوند و در اجرای عادی Skip شوند.
+
+ولی اجرای Suite و ثبت Pass/Fail نهایی جزو این مرحله نیست.
+
+## Build
+
+در صورت نیاز برای رفع خطاهای compilation یا dependency می‌توانی `restore` و `build` اجرا کنی، به شرط گرفتن اجازه پیش از هر دستور.
+
+این کار فقط Development Check محسوب می‌شود.
+
+اجرای build را جایگزین Validation، Test یا Acceptance معرفی نکن و به‌دلیل اجرای build، Task مربوط به Validation را تکمیل‌شده علامت نزن.
+
+## xAI
+
+طراحی تأییدشده را رعایت کن:
+
+- Provider: xAI با Endpoint `https://api.x.ai/v1`
+- Responses API
+- مدل اولیه `grok-4.7`
+- package رسمی `OpenAI 2.14.0` با Endpoint سفارشی روی xAI
+- نام Typeها و متدهای SDK فقط طبق research.md (R-02) و همان نسخهٔ Package؛ امضای سازندهٔ `ResponsesClient` را با Package نصب‌شده بررسی کن و حدس نزن
+- non-streaming
+- `store=false`
+- Retry خودکار SDK خاموش
+- سقف `MaxOutputTokenCount` برابر ۸۰۰۰
+- بدون Tool Calling
+- بدون MCP
+- بدون Web Search، X Search، File Search یا Code Execution
+- بدون RAG
+- بدون Agent
+- بدون fallback خودکار
+
+Structured Output باید با Schema نسخه‌دار `content_review_v1` و `text.format` از نوع `json_schema` با `strict: true` انجام شود.
+
+Artifact موجود:
+
+`specs/002-ai-content-review/contracts/model-output.schema.json`
+
+Source of Truth قرارداد Wire باقی بماند.
+
+JSON Mode ساده یا Prompt-only JSON استفاده نشود.
+
+کلید API را در کد، `appsettings`، مستندات یا Log قرار نده؛ فقط از User Secrets یا متغیر محیطی `ContentReview__ApiKey` خوانده شود. بدون کلید، برنامه باید اجرا شود و فقط درخواست بررسی پاسخ 503 بگیرد.
+
+## مرز مسئولیت‌ها
+
+Application مسئول:
+
+- Authorization
+- Ownership
+- Eligibility
+- Snapshot
+- Validation
+- Freshness
+- Recheck
+- ذخیرهٔ نتیجهٔ معتبر
+- Business decision
+
+باشد.
+
+`Infra.AI` فقط مسئول:
+
+- SDK
+- Prompt
+- Provider request
+- Schema enforcement
+- Protocol outcome
+- parsing candidate
+
+باشد.
+
+Type یا exception مربوط به SDK `OpenAI` نباید وارد Application شود.
+
+AI نباید:
+
+- Post را تغییر دهد
+- Permission تصمیم بگیرد
+- Post را Submit کند
+- Approve کند
+- Publish کند
+- به DataAccess وابسته شود
+
+## Task status
+
+هر Taskی که واقعاً پیاده‌سازی آن تمام شد در `tasks.md` به `[X]` تغییر کند.
+
+Taskهای تعویق‌داده‌شده باید `[ ]` باقی بمانند.
+
+اگر Task دیگری بدون اجرای تست/Eval قابل تکمیل نیست، نتیجهٔ ساختگی ایجاد نکن؛ آن را باز نگه دار و در گزارش نهایی دلیلش را مشخص کن.
+
+## محدودیت مرحله
+
+Feature بعدی را شروع نکن.
+
+Tool Calling، MCP، RAG، Qdrant و Agent وارد این Feature نشوند.
+
+Package جدیدی غیر از `OpenAI 2.14.0` اضافه نکن، مگر اینکه `tasks.md` آن را مشخص کرده باشد؛ در غیر این صورت ابتدا گزارش بده.
+
+Migration را روی پایگاه داده اعمال نکن.
+
+`Prompts/` و `spec.md` را تغییر نده.
+
+Constitution و تصمیم‌های تثبیت‌شدهٔ Technical Baseline را تغییر نده، مگر اینکه یک تعارض واقعی کشف شود؛ در آن صورت خودکار اصلاح نکن و فقط گزارش بده.
+
+## گزارش نهایی
+
+در پایان گزارش کن:
+
+1. نگاشت این Prompt به Taskهای `tasks.md` همین پروژه.
+2. چند Task تکمیل شدند.
+3. چه Taskهایی باز ماندند و چرا.
+4. چه پروژه‌ها و فایل‌های اصلی اضافه یا تغییر کردند.
+5. معماری نهایی مسیر Content Review چگونه است.
+6. Structured Output چگونه پیاده‌سازی شد.
+7. مرز Application و Infra.AI چگونه حفظ شد.
+8. چه Test/Eval infrastructureای برای جلسهٔ بعد آماده شده است.
+9. آیا Build انجام شد و نتیجه چه بود.
+10. چه محدودیت یا ریسک بازی باقی مانده است.
+11. تأکید کن که Validation و Acceptance هنوز انجام نشده‌اند.
+
+پس از پایان Implementation متوقف شو و هیچ Test، Evaluation یا Feature بعدی را آغاز نکن.
