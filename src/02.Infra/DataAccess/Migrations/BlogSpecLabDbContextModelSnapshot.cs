@@ -17,6 +17,53 @@ namespace BlogSpecLab.Infra.DataAccess.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.ContentReviews.ContentReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Outcome")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PromptVersion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ReviewedPostModifiedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ReviewedPostVersion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SchemaVersion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId", "CreatedAt");
+
+                    b.ToTable("ContentReviews", (string)null);
+                });
+
             modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -169,6 +216,77 @@ namespace BlogSpecLab.Infra.DataAccess.Migrations
                     b.HasKey("UserId", "Role");
 
                     b.ToTable("UserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("BlogSpecLab.Core.Domain.ContentReviews.ContentReview", b =>
+                {
+                    b.HasOne("BlogSpecLab.Core.Domain.Posts.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("BlogSpecLab.Core.Domain.ContentReviews.ContentIssue", "Issues", b1 =>
+                        {
+                            b1.Property<Guid>("ContentReviewId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate();
+
+                            b1.Property<string>("Category")
+                                .IsRequired();
+
+                            b1.Property<string>("Excerpt")
+                                .IsRequired();
+
+                            b1.Property<string>("Explanation")
+                                .IsRequired();
+
+                            b1.Property<string>("Location")
+                                .IsRequired();
+
+                            b1.Property<string>("Severity")
+                                .IsRequired();
+
+                            b1.Property<string>("Suggestion");
+
+                            b1.HasKey("ContentReviewId", "__synthesizedOrdinal");
+
+                            b1.ToTable("ContentReviews");
+
+                            b1
+                                .ToJson("Issues")
+                                .HasColumnType("TEXT");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ContentReviewId");
+                        });
+
+                    b.OwnsMany("BlogSpecLab.Core.Domain.ContentReviews.MissingInformationItem", "MissingInformation", b1 =>
+                        {
+                            b1.Property<Guid>("ContentReviewId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate();
+
+                            b1.Property<string>("Description")
+                                .IsRequired();
+
+                            b1.HasKey("ContentReviewId", "__synthesizedOrdinal");
+
+                            b1.ToTable("ContentReviews");
+
+                            b1
+                                .ToJson("MissingInformation")
+                                .HasColumnType("TEXT");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ContentReviewId");
+                        });
+
+                    b.Navigation("Issues");
+
+                    b.Navigation("MissingInformation");
                 });
 
             modelBuilder.Entity("BlogSpecLab.Core.Domain.Posts.StatusChange", b =>

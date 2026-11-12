@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Http.Headers;
 using BlogSpecLab.Core.Application.ContentReviews;
 using BlogSpecLab.Infra.AI.ContentReviews;
 using BlogSpecLab.Tests.Api.Infrastructure;
@@ -76,7 +77,8 @@ public class ContentReviewLoggingTests
                 logging.AddProvider(_logs);
             }));
         var users = await TestUsers.CreateAsync(factory);
-        var author = loggingFactory.CreateClientFor(users.AuthorA);
+        var author = loggingFactory.CreateClient();
+        author.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", users.AuthorA.Token);
         var (id, _) = await CreatePostAsync(author, Title, Body);
         factory.ContentReviewModel.Returns(FakeContentReviewModel.Completed(
             FakeContentReviewModel.Issue("محرمانهٔ آزمون", explanation: ModelText)));
