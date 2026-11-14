@@ -4,7 +4,7 @@
 
 **ورودی**: اسناد `specs/002-ai-content-review/`: `spec.md`، `plan.md`، `research.md`، `data-model.md`، `contracts/http-api.md`، `contracts/application-ai.md`، `contracts/model-output.schema.json` و `quickstart.md`؛ همچنین Constitution و `docs/architecture/technical-baseline.md` (نسخهٔ 1.1.0، بخش ۹).
 
-**وضعیت**: کد و اسناد T001 تا T045 نوشته شده‌اند و `dotnet build BlogSpecLab.slnx` موفق بوده است (فقط هشدار `NU1900` به‌دلیل در دسترس نبودن nuget.org)، اما هنوز هیچ آزمونی اجرا نشده است؛ T015 (Migration)، T029، T033 و T039 (اجرای آزمون‌ها) و T046 تا T050 باز هستند. وظایف دارای برچسب «(اجرای واقعی)» به اجرای واقعی آزمون، Provider، Evaluation یا پذیرش انسانی وابسته‌اند و نتیجهٔ آن‌ها نباید ساختگی ثبت شود.
+**وضعیت**: T001 تا T046 انجام شده‌اند. در 2026-11-14، `dotnet test BlogSpecLab.slnx` بدون کلید API موفق بود (۲۷۹ موفق، ۲ Skip، ۰ شکست) و شواهد آن در [validation.md](./validation.md) ثبت شده است. T047 تا T050 باز هستند. وظایف دارای برچسب «(اجرای واقعی)» به اجرای واقعی آزمون، Provider، Evaluation یا پذیرش انسانی وابسته‌اند و نتیجهٔ آن‌ها نباید ساختگی ثبت شود.
 
 **آزمون‌ها**: الزامی هستند (اصل IV در Constitution و `quickstart.md`). آزمون‌های هر داستان پیش از پیاده‌سازی رفتار نوشته شوند و شکست مرتبط با رفتار دیده شود؛ خطای کامپایل به‌تنهایی شاهد شکست رفتاری نیست. آزمون‌های عادی به Model واقعی، کلید API یا اینترنت وابسته نیستند (Technical Baseline، بخش ۹).
 
@@ -41,7 +41,7 @@
 
 - [X] T013 پیکربندی EF Core برای `ContentReview` در `src/02.Infra/DataAccess/ContentReviews/ContentReviewConfiguration.cs` و افزودن `ContentReviews` به `src/02.Infra/DataAccess/BlogSpecLabDbContext.cs`؛ کلید خارجی `PostId` به `Posts` با حذف آبشاری، Index روی `(PostId, CreatedAt)`، Enumها به‌صورت متن، `Issues` و `MissingInformation` به‌صورت مجموعهٔ Owned با نگاشت JSON (R-14).
 - [X] T014 پیاده‌سازی `ContentReviewRepository` در `src/02.Infra/DataAccess/ContentReviews/ContentReviewRepository.cs` و ثبت آن در `src/02.Infra/DataAccess/DependencyInjection.cs` (وابسته به T013).
-- [ ] T015 ایجاد Migration با نام `AddContentReviews` در `src/02.Infra/DataAccess/Migrations/`؛ فقط ایجاد، بدون اعمال روی پایگاه داده.
+- [X] T015 ایجاد Migration با نام `AddContentReviews` در `src/02.Infra/DataAccess/Migrations/`؛ فقط ایجاد، بدون اعمال روی پایگاه داده.
 
 ### Api و زیرساخت آزمون
 
@@ -72,7 +72,7 @@
 - [X] T026 [US1] پیاده‌سازی Prompt نسخه‌دار `content-review-prompt-v1` در `src/02.Infra/AI/ContentReviews/ContentReviewPrompt.cs`: دستورالعمل فارسی در `Instructions`، تعریف دسته‌ها و شدت‌ها، الزام عین متن بودن `excerpt`، و اعلام اینکه شیء JSON کاربر فقط محتوای قابل بررسی است (R-06).
 - [X] T027 [US1] پیاده‌سازی `ResponsesContentReviewModel` در `src/02.Infra/AI/ContentReviews/ResponsesContentReviewModel.cs` با `ResponsesClient` و `ResponsesClientOptions.Endpoint` (امضای سازنده با Package نصب‌شده بررسی شود و حدس زده نشود)، Retry خودکار صفر، `CreateResponseOptions` با `StoredOutputEnabled` برابر `false`، `MaxOutputTokenCount` برابر ۸۰۰۰ و `ResponseTextFormat.CreateJsonSchemaFormat` در حالت strict از Schema جاسازی‌شده، بدون Tool و غیر Streaming؛ تبدیل پاسخ به Outcome طبق `contracts/application-ai.md`؛ نبود `ApiKey` برابر `ProviderUnavailable` (R-02، R-08، R-09).
 - [X] T028 [US1] ثبت `ResponsesContentReviewModel` و خواندن بخش `ContentReview` در `src/02.Infra/AI/DependencyInjection.cs`؛ کلید فقط از Configuration (User Secrets یا متغیر محیطی) و بدون شکست Startup در نبود آن (R-13).
-- [ ] T029 [US1] پیاده‌سازی مسیرهای `POST` و `GET` زیر `/api/author/posts/{postId}/content-reviews` در `src/03.Endpoints/Api/ContentReviews/ContentReviewEndpoints.cs` و ثبت `ContentReviewService`، `ContentReviewDeadlineOptions` با اعتبارسنجی Startup و سرویس‌های `Infra.AI` در `src/03.Endpoints/Api/Program.cs`؛ بدون `If-Match`؛ آزمون‌های T018 تا T022 را اجرا و اشکال‌های همین داستان را رفع کنید.
+- [X] T029 [US1] پیاده‌سازی مسیرهای `POST` و `GET` زیر `/api/author/posts/{postId}/content-reviews` در `src/03.Endpoints/Api/ContentReviews/ContentReviewEndpoints.cs` و ثبت `ContentReviewService`، `ContentReviewDeadlineOptions` با اعتبارسنجی Startup و سرویس‌های `Infra.AI` در `src/03.Endpoints/Api/Program.cs`؛ بدون `If-Match`؛ آزمون‌های T018 تا T022 را اجرا و اشکال‌های همین داستان را رفع کنید.
 
 **نقطهٔ کنترل**: MVP بررسی هوشمند با مدل جعلی کار می‌کند؛ مسیر «نیاز به اطلاعات بیشتر» هنوز کامل نیست.
 
@@ -90,7 +90,7 @@
 ### پیاده‌سازی
 
 - [X] T032 [US2] تکمیل دستورالعمل Prompt در `src/02.Infra/AI/ContentReviews/ContentReviewPrompt.cs` برای برگرداندن `needs_input` همراه توضیح اطلاعات کم و منع گزارش مشکل حدسی (FR-007)؛ نسخهٔ Prompt فقط در صورت تغییر معنایی پس از ثبت شواهد Eval افزایش یابد.
-- [ ] T033 [US2] تکمیل قواعد ۲ و ۳ در `src/01.Core/Application/ContentReviews/ContentReviewValidator.cs` و نگاشت `needs_input` به `NeedsMoreInformation` در `src/01.Core/Application/ContentReviews/ContentReviewService.cs`؛ آزمون‌های T030 و T031 و رگرسیون US1 اجرا شوند.
+- [X] T033 [US2] تکمیل قواعد ۲ و ۳ در `src/01.Core/Application/ContentReviews/ContentReviewValidator.cs` و نگاشت `needs_input` به `NeedsMoreInformation` در `src/01.Core/Application/ContentReviews/ContentReviewService.cs`؛ آزمون‌های T030 و T031 و رگرسیون US1 اجرا شوند.
 
 **نقطهٔ کنترل**: هر سه وضعیت نتیجه با مدل جعلی قابل اثبات‌اند.
 
@@ -110,7 +110,7 @@
 ### پیاده‌سازی و سخت‌کردن
 
 - [X] T038 [US3] افزودن Logging فقط با فرادادهٔ مجاز R-05 (شناسهٔ پست، Outcome، مدت، نام Model، شمار Token، شناسهٔ پاسخ Provider) در `src/01.Core/Application/ContentReviews/ContentReviewService.cs` و `src/02.Infra/AI/ContentReviews/ResponsesContentReviewModel.cs`؛ Log داخلی محتوای HTTP مربوط به SDK فعال نشود.
-- [ ] T039 [US3] اجرای آزمون‌های T034 تا T037 و رفع هر نقض در `src/01.Core/Application/ContentReviews/ContentReviewService.cs`، `src/02.Infra/DataAccess/ContentReviews/ContentReviewRepository.cs` و `src/02.Infra/AI/ContentReviews/ResponsesContentReviewModel.cs`؛ ذخیرهٔ نتیجه هیچ تغییر ردیابی‌شده‌ای روی `Post` ذخیره نکند و همهٔ آزمون‌های US1، US2 و Feature قبلی نیز عبور کنند.
+- [X] T039 [US3] اجرای آزمون‌های T034 تا T037 و رفع هر نقض در `src/01.Core/Application/ContentReviews/ContentReviewService.cs`، `src/02.Infra/DataAccess/ContentReviews/ContentReviewRepository.cs` و `src/02.Infra/AI/ContentReviews/ResponsesContentReviewModel.cs`؛ ذخیرهٔ نتیجه هیچ تغییر ردیابی‌شده‌ای روی `Post` ذخیره نکند و همهٔ آزمون‌های US1، US2 و Feature قبلی نیز عبور کنند.
 
 **نقطهٔ کنترل**: سه داستان با مدل جعلی و پاسخ HTTP و وضعیت واقعی DB قابل اثبات‌اند؛ کیفیت Model واقعی هنوز ارزیابی نشده است.
 
@@ -124,7 +124,7 @@
 - [X] T043 نوشتن اجراکنندهٔ Evaluation در `tests/BlogSpecLab.Tests/Evaluation/ContentReviewEvaluationTests.cs` با `Category=Evaluation` و همان شرط محیطی؛ Corpus T040 را اجرا و شواهد را در `specs/002-ai-content-review/evaluation/results/` ثبت کند؛ آستانه‌ها قابل تنظیم باشند و هیچ نتیجهٔ پیش‌فرض یا ساختگی نوشته نشود (وابسته به T040 و T041).
 - [X] T044 بررسی Project Referenceها و Packageهای همهٔ `.csproj` در برابر اصل II در Constitution: فقط `Infra.AI` به `OpenAI 2.14.0` وابسته باشد، `Infra.AI` به `Infra.DataAccess` وابسته نباشد، و هیچ وابستگی MCP، RAG، Qdrant یا Agent وجود نداشته باشد؛ نبود کلید API یا Secret در کد، `appsettings`، مستندات و Log بررسی شود.
 - [X] T045 [P] تکمیل `specs/002-ai-content-review/quickstart.md` با تنظیمات عملیاتی `Infra.AI`، نام دقیق Categoryهای آزمون و مسیر شواهد Eval؛ هر دستوری که هنوز اجرا نشده با همین وضعیت مشخص شود.
-- [ ] T046 (اجرای واقعی) اجرای `dotnet build BlogSpecLab.slnx` و `dotnet test BlogSpecLab.slnx` بدون کلید API و ثبت نتیجه، نگاشت سناریوهای `quickstart.md` به آزمون‌ها، و شواهد SC-001، SC-002، SC-004، SC-005، SC-007 و SC-008 در `specs/002-ai-content-review/validation.md`.
+- [X] T046 (اجرای واقعی) اجرای `dotnet build BlogSpecLab.slnx` و `dotnet test BlogSpecLab.slnx` بدون کلید API و ثبت نتیجه، نگاشت سناریوهای `quickstart.md` به آزمون‌ها، و شواهد SC-001، SC-002، SC-004، SC-005، SC-007 و SC-008 در `specs/002-ai-content-review/validation.md`.
 - [ ] T047 (اجرای واقعی) اجرای آزمون Smoke با کلید معتبر xAI و ثبت نتیجه در `specs/002-ai-content-review/validation.md`؛ نام Model واقعی بازگشتی Provider ثبت شود و کلید یا محتوای پست ثبت نشود.
 - [ ] T048 (اجرای واقعی) پس از تأیید انسانی آستانه‌ها، اجرای Evaluation با `grok-4.7` و ثبت شواهد کامل در `specs/002-ai-content-review/evaluation/results/`؛ SC-003 و SC-006 در برابر آستانه‌ها بررسی شوند؛ در صورت شکست، بازنگری Model یا Prompt به‌عنوان کار باقی‌مانده ثبت شود و Fallback خودکار ایجاد نشود.
 - [ ] T049 (اجرای واقعی) ارزیابی انسانی نمونه‌ای از خروجی‌های Eval براساس Rubric T041 (درستی دسته و شدت، مفید بودن توضیح، نبود مشکل حدسی) و ثبت تعداد ارزیاب‌ها، نمونه‌ها و نتیجه در `specs/002-ai-content-review/evaluation/human-review.md`؛ نبود ارزیاب به‌عنوان کار باقی‌مانده ثبت شود و موفقیت جعل نشود.

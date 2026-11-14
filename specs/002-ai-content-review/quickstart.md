@@ -8,8 +8,8 @@
 | تاریخ | 2026-11-11 |
 | طرح | [plan.md](./plan.md) |
 
-> کد و آزمون‌ها نوشته شده‌اند، اما هیچ‌یک از دستورهای این راهنما (Build، آزمون، Migration، Smoke و
-> Evaluation) هنوز اجرا و بررسی نشده است. نتیجهٔ اجرا در `validation.md` ثبت خواهد شد.
+> Build و `dotnet test` در 2026-11-14 اجرا و ثبت شده‌اند ([validation.md](./validation.md)). آزمون Smoke،
+> پذیرش Evaluation و اجرای دستی HTTP هنوز ثبت نشده‌اند.
 
 ## پیش‌نیازها
 
